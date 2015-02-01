@@ -29,7 +29,6 @@
 //definitions
 #define MAX_STRING_LEN 100 //length of the string
 
-
 int read( char* file_name, v_struct* p_vec_array ) {
 	FILE *fp;
 	fp = fopen(file_name, "r");
@@ -38,7 +37,7 @@ int read( char* file_name, v_struct* p_vec_array ) {
 	int i;
 	int lineCount = 0;
 
-	while (fgets(buffer, sizeof buffer, fp) != NULL)
+	while (fgets(buffer, sizeof(buffer), fp) != NULL)
 	{
 		i = 0;
 		while(buffer[i] != ',' && buffer[i] != '\0') {
@@ -46,38 +45,36 @@ int read( char* file_name, v_struct* p_vec_array ) {
 		}
 		buffer[i] = '\0';
 
-		//store values
+		// store values
 		p_vec_array[lineCount].r = atof(buffer);
 		p_vec_array[lineCount].theta = atof(&buffer[i+1]);
 
-		printf("R: %f\n",p_vec_array[lineCount].r);
-		printf("Theta: %f\n",p_vec_array[lineCount].theta);
+		// printf("R: %f\n",p_vec_array[lineCount].r);
+		// printf("Theta: %f\n",p_vec_array[lineCount].theta);
+
+		// If the provided vector direction is > 360, then your code must subtract 360 from θ, i.e. θ = θ − 360, and
+		// If the provided vector direction is < −360, then your code must add 360 to θ, i.e. θ = θ + 360.
+		if(p_vec_array[lineCount].theta > 360) {
+			p_vec_array[lineCount].theta = p_vec_array[lineCount].theta - 360;
+		}
+		else if(p_vec_array[lineCount].theta < -360) {
+			p_vec_array[lineCount].theta = p_vec_array[lineCount].theta + 360;
+		}
+
+		// printf("new theta: %f\n",p_vec_array[lineCount].theta);
 		lineCount++;
 	}
-	printf("%d Lines",lineCount);
 
 	fclose(fp);
 	return lineCount;
 }
 
-
-// Function prototype that uses the magnitude and 
-// direction values in vector structure
-// to compute the x component, i.e. r*cos(theta)
-//
-// Note(s): 
-//	- theta must be converted from degrees to radians 
-//	  prior to calculation.
-//
-// Arguments: 	p_vector = point to v_struct 
-// Return: 	double that represents x component value
-//
-
 double x_component( v_struct* p_vector ) {
-	printf("%d",p_vector.r*(cos(p_vector.theta)));
-	return 0;
+	double thetaRad = p_vector[0].theta*(M_PI/180); //degrees -> radians
+	return p_vector[0].r*(cos(thetaRad));
 }
 
 double y_component( v_struct* p_vector ) {
-	return 0;
+	double thetaRad = p_vector[0].theta*(M_PI/180); //degrees -> radians
+	return p_vector[0].r*(sin(thetaRad));
 }

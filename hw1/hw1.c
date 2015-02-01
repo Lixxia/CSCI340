@@ -19,10 +19,26 @@
 //
 //
 int main( int argc, char** argv ) {
+	int i;
 	v_struct vec_array[TOTAL_VECS];
 
-	read("vectors.txt",vec_array);
-	//printf("%f\n", x_component(&vec_array[4])); // & = give me the address of
+	if(argv[1] == NULL) {
+		printf("Program expects filename.");
+		exit(0);
+	}
+
+	read(argv[1],vec_array);
+
+	for(i=0; i<TOTAL_VECS; i++) {
+		printf("r = %.2f, ",vec_array[i].r);
+		printf("theta = %.2f degrees, ", vec_array[i].theta);
+		printf("theta = %.2f radians, ",vec_array[i].theta*(M_PI/180));
+		printf("x_comp = %.2f, ",x_component(&vec_array[i]));
+		printf("y_comp = %.2f\n",y_component(&vec_array[i]));
+	}
+	
+	
+
 	// --------------------------------
 	// Steps to be performed
 	//	1. Define variables (including arrays)
@@ -38,10 +54,7 @@ int main( int argc, char** argv ) {
 	//		r = <value>, theta = <value> degrees, <value> radians, x_comp = <value>, y_comp = <value>
 	//	    For example:
 	//		r = 10.00, theta = 180.00 degrees, theta = 3.14 radians, x_comp = -10.00, y_comp = 0.00 
-	//
-
-	// printf("\n Homework Assignment 1 - Have fun!\n" );
-	
+	//	
 	return 0;
 
-} // end main() function
+}
