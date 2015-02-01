@@ -7,7 +7,7 @@
 // -----------------------------------
 
 #define PI 3.14159265	// define PI constant
-#define DEBUG 0		// 0 turns off debug printfs, 1 turns on debug printfs
+#define DEBUG 0			// 0 turns off debug printfs, 1 turns on debug printfs
 
 // -----------------------------------
 // C-Style data structure to hold vector
@@ -16,7 +16,7 @@
 //
 typedef struct {
 
-	double r;	// magnitude value
+	double r;		// magnitude value
 	double theta;	// direction value (in degrees)
 
 } v_struct;
@@ -49,7 +49,7 @@ typedef struct {
 //     in the vectors text file.
 //
 // Arguments: 	char* file_name = file name of vector text file
-//	      	p_vec_array = pointer to an array of v_structs
+//	      		p_vec_array = pointer to an array of v_structs
 // Return:      Number (int data type) of vectors read-in by function
 //
 int read( char* file_name, v_struct* p_vec_array );
@@ -64,7 +64,7 @@ int read( char* file_name, v_struct* p_vec_array );
 //	  prior to calculation.
 //
 // Arguments: 	p_vector = point to v_struct 
-// Return: 	double that represents x component value
+// Return: 		double that represents x component value
 //
 double x_component( v_struct* p_vector );
 
@@ -78,7 +78,7 @@ double x_component( v_struct* p_vector );
 //	  prior to calculation.
 //
 // Arguments: 	p_vector = point to v_struct 
-// Return: 	double that represents y component value
+// Return: 		double that represents y component value
 //
 double y_component( v_struct* p_vector );
 

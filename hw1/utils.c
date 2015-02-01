@@ -6,28 +6,29 @@
 //
 // -----------------------------------
 
+// NOTES:
 // gcc -Wall utils.c hw1.c -lm
 // -lm links with math library, -Wall tells to print out warnings
 // use -g flag for debugging
 // gdb a.out (default thingydo)
 // >> run
 // will tell you where it got the errors
+
+// tar czf barber.tgz folder
+//or tar.gz
+
 // ----------------------------------------------
 // These are the only libraries that can be 
 // used. Under no circumstances can additional 
 // libraries be included
-
-// tar czf barber.tgz folder
-//or tar.gz
 
 #include <stdio.h>	// IO functions
 #include <stdlib.h> 	// atof function
 #include <math.h>	// math functions
 #include "utils.h"	// your own functions
 
-
-//definitions
-#define MAX_STRING_LEN 100 //length of the string
+// Definitions
+#define MAX_STRING_LEN 100 //length of the file buffer string
 
 int read( char* file_name, v_struct* p_vec_array ) {
 	FILE *fp;
@@ -70,11 +71,11 @@ int read( char* file_name, v_struct* p_vec_array ) {
 }
 
 double x_component( v_struct* p_vector ) {
-	double thetaRad = p_vector[0].theta*(M_PI/180); //degrees -> radians
+	double thetaRad = p_vector[0].theta*(PI/180); //degrees -> radians
 	return p_vector[0].r*(cos(thetaRad));
 }
 
 double y_component( v_struct* p_vector ) {
-	double thetaRad = p_vector[0].theta*(M_PI/180); //degrees -> radians
+	double thetaRad = p_vector[0].theta*(PI/180); //degrees -> radians
 	return p_vector[0].r*(sin(thetaRad));
 }
