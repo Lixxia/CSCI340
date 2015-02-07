@@ -29,7 +29,7 @@ HINT(s): This function is "essentially" an exercise in string parsing.
 		the command struct would be:
 
 				- name = "cd"
-				- argc = 1
+				- argc = 2
 				- argv = {"/mnt/cdrom"} 
 
         EXAMPLE#2, if the user enters
@@ -41,7 +41,7 @@ HINT(s): This function is "essentially" an exercise in string parsing.
 		struct would be:
 
 				- name = "ls"
-				- argc = 1
+				- argc = 2
 				- argv = {"-la"} 
 
         EXAMPLE#3, if the user enters nothing at the shell prompt (i.e. 
