@@ -67,30 +67,74 @@ HINT(s): This function is "essentially" an exercise in string parsing.
 void parse( char* line, command_t* p_cmd ) {
 	// need to write strcopy function
 
-	int numArg;
+	int argc, i, n;
 	// find . -name hw2.c -print
 	// name = name of command
 	// argc = number of arguments = 5
-	// argv = pointer to array of strings. = "find" "." "-name" "hw2.c" "-print" "NULL"
+	// argv = pointer to array of strings. = "find" "." "-name" "hw2.c" "-print" "NULL" <- important for last spot
 
 	//have to malloc for name
 	//have to create array for argv
 	// loop arc times, each time mallocing space for parameters
-	numArg=0;
-	while(line[numArg] != NULL) {
-		// count, keep track of how many args there are --> argc
-		// count spaces, add 1?
-		if(line[numArg] == ' ') {
-			numArg++;
+
+	// make this a countParams function?
+	argc=0;
+	i=0;
+	while(line[i] != '\n') {
+		printf("%c", line[i]);
+		if(line[i] == ' ') {
+			argc++;
 		}
+		i++;
 	}
-	p_cmd.argc = numArg;
+
+	argc += 1;
+	p_cmd -> argc = argc;
+	printf("\nPCMD ARGC: %i", p_cmd[0].argc);
+
+
+	p_cmd -> argc = count;
 
 	//malloc name 
-	p_cmd --> name = (char*) malloc((count+1)*sizeof(char));
+	// p_cmd -> name = (char*) malloc((count+1)*sizeof(char));
+
 
 	//malloc argv name
-	p_cmd --> argv = (char**) malloc((p_cmd --> argc+1)*sizeof(char*)); //malloc num things * size of each thing and cast it to be pointer to a pointer
+	p_cmd -> argv = (char**) malloc((count+1)*sizeof(char*)); //malloc num things * size of each thing and cast it to be pointer to a pointer
+	
+	i=0; 
+	for(n=0;n<argc;n++) {
+		tokenLength=0;
+		// want to continue on for here, need a piece to skip whitespace and return to top
+		while(line[i] != ' ' && line[i] != '\0') {
+			i++; //controlling where we are in the string
+			tokenLength++; //keeping length of string
+			printf("\nLine i:%c",line[i]);
+			p_cmd[0].name += line[i];
+			printf("\ncmd name: %s", p_cmd[0].name);
+		}
+		// i holds length of first command
+		if(i > 0) {
+			// malloc space for name based on size of first cmd
+			p_cmd -> argv[0] = malloc((tokenLength+1)*sizeof(char));
+			j=0; //j is broken in a loop FIX IT
+			while(j < tokenLength) {
+				p_cmd -> argv[0][j] = line[j]; //get jth char of argv[0]
+				j++;
+			}
+			//need to add null char at the end
+			p_cmd -> argv[0][j] = '\0';
+		}
+
+		// big loop for argv, name at the end
+		// loop through argc times
+	}
+	
+	
+	
+
+	printf("NAME: %s",p_cmd[0].name);
+	
 
 }
 

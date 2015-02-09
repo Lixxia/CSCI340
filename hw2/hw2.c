@@ -18,7 +18,7 @@
 //
 int main( int argc, char** argv ) {
 	//write a prompt, read in a command print it back
-	
+
 	// ----------------------------------
 	// Pseudocode
 	// ----------------------------------
@@ -37,11 +37,14 @@ int main( int argc, char** argv ) {
 	// 		cleanup( ... )
 	//
 
-	// char line[100];
-	// command_t *cmd;
-	// parse(line,&cmd);
+	char line[100];
+	command_t *cmd;
 
-	printf( "CSCI 340 Homework Assignment 2 - Have Fun!\n" );
+	printf("Input a command ");
+   	fgets(line, 100, stdin);
+   	printf("%s", line);
+
+	parse(line,&cmd);
 
 	return 0;
 
