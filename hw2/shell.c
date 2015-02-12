@@ -91,47 +91,6 @@ void parse( char* line, command_t* p_cmd ) {
 
 }
 
-/* ------------------------------------------------------------------------------
-
-This function will only execute external commands (cmd for short), such as ls 
-or cp, using the execv system function. In the execute function, you must fork 
-a child process. 
-
- HINT(s): 
- (1) An example is provided that demonstrates how the fork and wait operations 
- 	are coded (see "Executing a Command" section in assignment PDF).
- (2) The execv is assuming the full path name for the cmd is provided (i.e. the 
- 	exact file location, starting from / or the root folder). For instance, simply 
- 	providing the "pwd" cmd is equivalent to "./pwd" (i.e. pwd cmd is located in 
- 	the same folder as parent process). Instead, the full path (/bin/pwd) must be 
- 	given. To achieve this, use the find_fullpath function implemented in this 
- 	header file. An incomplete code segement is provided below.
-
-			int fnd = FALSE;
-			char* fullpath;
-
-			fnd = find_fullpath( fullpath, p_cmd );
-		
-			if ( fnd ) {
-				if ( fork() == 0 ) {
-					execv( fullpath, p_cmd->argv );
-					...
-				}
-				//child returns a PID of 0 - !0 parent. only child does exec ^
-				wait( ... );  //wait until execv is finished - pass in NULL?
-				// int stat;  wait(&stat);
-			} else {
-				// display to user cmd not found
-			}
-
-
- 
- function:
-	- parameter(s): pointer to a command_t structure
-    - return: status code from wait function.
-
-*/
-
 int execute( command_t* p_cmd ) {
 	int found = FALSE;
 	int childStatus;
@@ -141,7 +100,7 @@ int execute( command_t* p_cmd ) {
 
 	printf("\nfullpath=== %s\n",fullpath);
 
-	if (found) {
+	if(found) {
 		if( fork() == 0 ) { 
 			//child process
 			execv(fullpath, p_cmd->argv);
@@ -155,7 +114,7 @@ int execute( command_t* p_cmd ) {
 		printf("Command not found.");
 	}
 
-	return 0;
+	return childStatus;
 
 }
 
@@ -234,10 +193,26 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 	return pathFound;
 }
 
+
+/* ------------------------------------------------------------------------------
+
+This function will determine if command (cmd for short) entered in the shell by 
+the user is a valid builtin command.
+
+HINT(s): Use valid_builtin_commands array defined in shell.c
+
+function:
+	- parameter(s): pointer to a command_t structure
+	- return: TRUE if the cmd is in array, else FALSE if not in array. 
+
+*/
+
 int is_builtin( command_t* p_cmd ) {
-	//command -v yap
-	//exit code 0 if there, exit 1 if not
-	//use instead of which for more os compatibility! 
+	// p_cmd -> name;
+	// valid_builtin_commands
+	printf("\nsize of thing: %f",sizeof(valid_builtin_commands));
+
+	// while(p_cmd ->)
 	return 0;
 
 }

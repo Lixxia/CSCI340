@@ -46,7 +46,8 @@ int main( int argc, char** argv ) {
 
 	parse(line,&cmd);
 
-	execute(&cmd);
+	// execute(&cmd);
+	is_builtin(&cmd);
 
 	return 0;
 
