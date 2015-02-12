@@ -23,13 +23,12 @@ const char* valid_builtin_commands[] = {"cd", "exit", NULL};
 
 
 void parse( char* line, command_t* p_cmd ) {
-	// need to write strcopy function
-
 	int numArgs, i, n, j, tokenLength,stringPos,tokenStart;
 	// find . -name hw2.c -print
 	// name = name of command
 	// argc = number of arguments = 5
 	// argv = pointer to array of strings. = "find" "." "-name" "hw2.c" "-print" "NULL" <- important for last spot
+	// find . -name hw2.c -print
 
 	//have to malloc for name
 	//have to create array for argv
@@ -48,9 +47,8 @@ void parse( char* line, command_t* p_cmd ) {
 
 	numArgs += 1;
 	p_cmd -> argc = numArgs;
-	printf("\nPCMD ARGC: %i", p_cmd[0].argc);
 	
-	//initial argv malloc
+	// initial argv malloc
 	p_cmd -> argv = (char**) malloc((numArgs+1)*sizeof(char*)); //malloc num things * size of each thing and cast it to be pointer to a pointer
 	
 	stringPos=0; 
@@ -58,8 +56,8 @@ void parse( char* line, command_t* p_cmd ) {
 		tokenLength=0;
 		// want to continue on for here, need a piece to skip whitespace and return to top
 		while(line[stringPos] != ' ' && line[stringPos] != '\0') {
-			stringPos++; //controlling where we are in the string
-			tokenLength++; //keeping length of string
+			stringPos++; // controlling where we are in the string
+			tokenLength++; // keeping length of string
 		}
 
 		// make sure length of first command > 0. ie it exists
@@ -70,29 +68,26 @@ void parse( char* line, command_t* p_cmd ) {
 			j=0;
 			printf("val of j: %i",j);
 			while(j < tokenLength) {
-				p_cmd -> argv[n][j] = line[tokenStart]; //get jth char of argv[n]
+				p_cmd -> argv[n][j] = line[tokenStart]; // get jth char of argv[n]
 				j++;
 				tokenStart++;
 			}
-			//need to add null char at the end
+			// need to add null char at the end
 			p_cmd -> argv[n][j] = '\0';
 		}
 
-		// big loop for argv, name at the end
-		// loop through argc times
 		stringPos++; //to move to the next section - skip whitespace
 	}
 	p_cmd -> argv[n+1] = NULL;
 	
-	printf("argv : %s",p_cmd[0].argv[0]);
-	printf("argv 2: %s", p_cmd[0].argv[1]);
-	printf("argv 3: %s",p_cmd[0].argv[2]);
-	printf("argv 4: %s", p_cmd[0].argv[3]);
+	// printf("argv : %s",p_cmd[0].argv[0]);
+	// printf("argv 2: %s", p_cmd[0].argv[1]);
+	// printf("argv 3: %s",p_cmd[0].argv[2]);
+	// printf("argv 4: %s", p_cmd[0].argv[3]);
 
 	//malloc name 
 	p_cmd -> name = (char*) malloc((numArgs+1)*sizeof(char));
 	p_cmd -> name = p_cmd[0].argv[0];
-	printf("name name: %s", p_cmd[0].name);
 
 }
 
@@ -122,7 +117,9 @@ a child process.
 					execv( fullpath, p_cmd->argv );
 					...
 				}
-				wait( ... );
+				//child returns a PID of 0 - !0 parent. only child does exec ^
+				wait( ... );  //wait until execv is finished - pass in NULL?
+				// int stat;  wait(&stat);
 			} else {
 				// display to user cmd not found
 			}
@@ -137,56 +134,40 @@ a child process.
 
 int execute( command_t* p_cmd ) {
 	int found = FALSE;
-	char* fullpath;
-	fullpath=(char*)malloc(100); 
+	int childStatus;
+	char fullpath[200]; 
 
 	found = find_fullpath(fullpath,p_cmd);
+
+	printf("\nfullpath=== %s\n",fullpath);
+
+	if (found) {
+		if( fork() == 0 ) { 
+			//child process
+			execv(fullpath, p_cmd->argv);
+			perror("Execute terminated with an error condition!\n");
+			exit(1);
+		}
+
+		wait(&childStatus);
+	}
+	else {
+		printf("Command not found.");
+	}
 
 	return 0;
 
 }
 
-
-/* ------------------------------------------------------------------------------
-
-This function is used determine if the named command (cmd for short) entered by 
-the user in the shell can be found in one of the folders defined in the PATH 
-environment (env or short) variable.
-
-HINT(s): Use getenv() system function to retrieve the folders defined in the 
-		PATH variable. An small code segment is shown below that demonstrates 
-		how to retrieve folders defined in your PATH.
-
-			char* path_env_variable;
-			path_env_variable = getenv( "PATH" );
-			printf("PATH = %s\n", path_env_variable );
-
-		The format of the PATH is very simple, the ':' character is delimiter, 
-		i.e. used to mark the beginning and end of a folder defined in the path.
-
-		Write a loop that parses each folder defined in the path, then uses this 
-		folder along with the stat function (see "File/Directory Status" section 
-		in the assignment PDF).
- 
- function:
-	- parameter(s): char* pointer that contains the fullpath to named command found 
-					by this function, and a pointer to an existing command_t structure
-	- return: TRUE if cmd is in the PATH, or FALSE if not in the PATH. 
-
-	---
-
-*/
-
 int find_fullpath( char* fullpath, command_t* p_cmd ) {
-	int i, numPaths, n, position, length, start, j, namePos;
+	int i, numPaths, n, position, length, start, j, namePos, exists;
 	struct stat buffer;
-	char testPath[100];
 
 	char* cmd = p_cmd -> name;
-	int exists = FALSE;
+	int pathFound = FALSE;
 	char* env_path = getenv("PATH");
 
-	printf("PATH = %s\n", env_path );
+	// printf("PATH = %s\n", env_path );
 
 	numPaths=0;
 	i=0;
@@ -198,7 +179,7 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 		i++;
 	}
 	numPaths++;
-	printf("num paths: %i", numPaths);
+	// printf("num paths: %i", numPaths);
 
 	position = 0;
 	
@@ -212,35 +193,36 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 		start=position-length;
 		j=0;
 		while(j < length) {
-			testPath[j] = env_path[start];
+			fullpath[j] = env_path[start];
 			j++;
 			start++;
 		}
 
-		testPath[j] = '/';
+		fullpath[j] = '/';
 
 		j++;
 		namePos=0;
 		while(cmd[namePos] != '\0') {
-			testPath[j] = cmd[namePos];
+			fullpath[j] = cmd[namePos];
 			j++;
 			namePos++;
 		}
-		testPath[j] = '\0';
-		printf("\nPath to test: %s",testPath);		
+		fullpath[j] = '\0';
+		// printf("\nPath to test: %s",fullpath);		
 
 		position++; //move to next path variable
 
-		// string that represents the fully qualified
-		// path of a file or directory on the file system
-		exists = stat( testPath, &buffer );
+		exists = stat( fullpath, &buffer );
 		if ( exists == 0 && ( S_IFDIR & buffer.st_mode ) ) {
 			printf("\nDirectory Exists.");
 		} 
 		else if ( exists == 0 && ( S_IFREG & buffer.st_mode ) ) {
-			exists = TRUE;
-			fullpath = testPath;
+			pathFound = TRUE;
+			// set fullpath = fullpath;
+
+			// fullpath[0] = fullpath[0];
 			printf("\nFile Exists.");
+			break;
 		} 
 		else {
 			printf("\nNot a valid file or directory.");
@@ -248,9 +230,8 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 
 	}
 
-	printf("\nfinal fullpath")
-	return exists;
-
+	printf("\nfinal fullpath: %s",fullpath);
+	return pathFound;
 }
 
 int is_builtin( command_t* p_cmd ) {
