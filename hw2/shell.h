@@ -86,7 +86,9 @@ a child process.
 					execv( fullpath, p_cmd->argv );
 					...
 				}
-				wait( ... );
+				//child returns a PID of 0 - !0 parent. only child does exec ^
+				wait( ... );  //wait until execv is finished - pass in NULL?
+				// int stat;  wait(&stat);
 			} else {
 				// display to user cmd not found
 			}

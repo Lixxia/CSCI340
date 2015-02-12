@@ -38,13 +38,15 @@ int main( int argc, char** argv ) {
 	//
 
 	char line[100];
-	command_t *cmd;
+	command_t cmd;
 
 	printf("Input a command ");
    	fgets(line, 100, stdin);
-   	printf("%s", line);
+   	printf("Entered: %s", line);
 
 	parse(line,&cmd);
+
+	execute(&cmd);
 
 	return 0;
 
