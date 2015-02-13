@@ -19,4 +19,4 @@ run:
 	./hw2
 
 tarball:
-	# tar -cvzf barber.tar.gz *
+	tar -cvzf barber.tar.gz *

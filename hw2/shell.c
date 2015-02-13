@@ -1,7 +1,3 @@
-// ----------------------------------------------
-// These are the only libraries that can be 
-// used. Under no circumstances can additional 
-// libraries be included
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,15 +6,11 @@
 #include <sys/stat.h>
 #include "shell.h"
 
-// --------------------------------------------
-// Currently only two builtin commands for this
-// assignment exist, however in future, more could 
-// be added to the builtin command array.
-// --------------------------------------------
+// builtin commands
 const char* valid_builtin_commands[] = {"cd", "exit", NULL};
 
+// implementation of all functions
 void parse( char* line, command_t* p_cmd ) {
-	printf("\nBEGIN PARSE");
 	int numArgs, n, j, tokenLength,stringPos,tokenStart;
 
 	// make this a countParams function?
@@ -59,11 +51,9 @@ void parse( char* line, command_t* p_cmd ) {
 	// malloc name and get value from argv
 	p_cmd -> name = (char*) malloc(100);
 	p_cmd -> name = p_cmd[0].argv[0];
-	printf("\nEND PARSE");
 }
 
 int execute( command_t* p_cmd ) {
-	printf("\n BEGIN EXECUTE");
 	int found = FALSE;
 	int childStatus;
 	char fullpath[PATH_LENGTH]; 
@@ -83,12 +73,10 @@ int execute( command_t* p_cmd ) {
 	else {
 		printf("Command not found.");
 	}
-	printf("\n END EXECUTE");
 	return childStatus;
 }
 
 int find_fullpath( char* fullpath, command_t* p_cmd ) {
-	printf("\n BEGIN FIND FP");
 	int numPaths, n, position, length, start, j, namePos, exists;
 	struct stat buffer;
 
@@ -142,12 +130,10 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 		}
 	}
 
-	printf("\n END FIND FP");
 	return pathFound;
 }
 
 int is_builtin( command_t* p_cmd ) {
-	printf("\n BEGIN ISBUILTIN");
 	int numBuiltin, n, i, found;
 	char* cmd = p_cmd -> name;
 
@@ -160,19 +146,12 @@ int is_builtin( command_t* p_cmd ) {
 		if(is_same(cmd, valid_builtin_commands[n])) {
 			return TRUE;
 		}
-		printf("\ntestchar2 '%c'\n",valid_builtin_commands[n][i]);
-		if(found == TRUE && valid_builtin_commands[n][i] == '\0') {
-			break;
-		}
 	}
-
-	printf("\n END ISBUILTIN");
 
 	return FALSE;
 }
 
 int do_builtin( command_t* p_cmd ) {
-	printf("\n BEGIN DOBUILTIN");
 	int status;
 
 	if(p_cmd -> name[0] == 'c') {
@@ -192,13 +171,11 @@ int do_builtin( command_t* p_cmd ) {
 		status=ERROR;
 		perror("Something went wrong in do_builtin.");
 	}
-	printf("\n END DOBUILTIN");
 
 	return status;
 }
 
 void cleanup( command_t* p_cmd ) {
-	printf("\n BEGIN CLEANUP");
 	int i, numArgs;
 	numArgs = p_cmd -> argc;
 
@@ -207,8 +184,9 @@ void cleanup( command_t* p_cmd ) {
     }
     free(p_cmd -> argv);
     free(p_cmd -> name);
-    printf("\n END CLEANUP");
 }
+
+// Some helper functions
 
 int is_same(const char* first, const char* second) {
     char* i = first;
