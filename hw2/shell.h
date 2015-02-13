@@ -176,3 +176,7 @@ function:
 
 */
 void cleanup( command_t* p_cmd );
+
+int is_same(const char* first, const char* second);
+
+int count_params(char* string, char delimiter, int fix_turn);

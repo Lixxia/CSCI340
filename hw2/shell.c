@@ -19,23 +19,10 @@ const char* valid_builtin_commands[] = {"cd", "exit", NULL};
 
 void parse( char* line, command_t* p_cmd ) {
 	printf("\nBEGIN PARSE");
-	int numArgs, i, n, j, tokenLength,stringPos,tokenStart;
+	int numArgs, n, j, tokenLength,stringPos,tokenStart;
 
 	// make this a countParams function?
-	numArgs=0;
-	i=0;
-	while(line[i] != '\0') {
-		if(line[i] == ' ') {
-			numArgs++;
-		}
-		else if(line[i] == '\n' || line[i] == '\r') {
-			line[i] = '\0';
-		}
-
-		i++;
-	}
-
-	numArgs += 1;
+	numArgs = count_params(line,' ',TRUE);
 	p_cmd -> argc = numArgs;
 	
 	// initial argv malloc
@@ -102,24 +89,14 @@ int execute( command_t* p_cmd ) {
 
 int find_fullpath( char* fullpath, command_t* p_cmd ) {
 	printf("\n BEGIN FIND FP");
-	int i, numPaths, n, position, length, start, j, namePos, exists;
+	int numPaths, n, position, length, start, j, namePos, exists;
 	struct stat buffer;
 
 	char* cmd = p_cmd -> name;
 	int pathFound = FALSE;
 	char* env_path = getenv("PATH");
 
-	// printf("PATH = %s\n", env_path );
-
-	numPaths=0;
-	i=0;
-	while(env_path[i] != '\0') {
-		if(env_path[i] == ':') {
-			numPaths++;
-		}
-		i++;
-	}
-	numPaths++;
+	numPaths = count_params(env_path,':',FALSE);
 
 	position = 0;
 	for(n=0; n < numPaths; n++) {
@@ -157,11 +134,11 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 		// } 
 		if ( exists == 0 && ( S_IFREG & buffer.st_mode ) ) {
 			pathFound = TRUE;
-			printf("\nFile Exists.");
+			// printf("\nFile Exists.");
 			break;
 		} 
 		else {
-			printf("\nNot a valid file.");
+			// printf("\nNot a valid file.");
 		}
 	}
 
@@ -178,18 +155,10 @@ int is_builtin( command_t* p_cmd ) {
 	found = FALSE;
 	
 	for(n=0;n<numBuiltin;n++) {
+
 		i=0;
-		while(cmd[i] != '\0') {
-			if(cmd[i] == valid_builtin_commands[n][i]) {
-				found = TRUE;
-				printf("same");
-			}
-			else {
-				found = FALSE;
-				printf("diff");
-			}
-			printf("\ntestchar '%c'\n",cmd[i]);
-			i++;
+		if(is_same(cmd, valid_builtin_commands[n])) {
+			return TRUE;
 		}
 		printf("\ntestchar2 '%c'\n",valid_builtin_commands[n][i]);
 		if(found == TRUE && valid_builtin_commands[n][i] == '\0') {
@@ -199,7 +168,7 @@ int is_builtin( command_t* p_cmd ) {
 
 	printf("\n END ISBUILTIN");
 
-	return found;
+	return FALSE;
 }
 
 int do_builtin( command_t* p_cmd ) {
@@ -237,7 +206,37 @@ void cleanup( command_t* p_cmd ) {
     	free(p_cmd -> argv[i]);
     }
     free(p_cmd -> argv);
-    // free(p_cmd -> name);
+    free(p_cmd -> name);
     printf("\n END CLEANUP");
 }
 
+int is_same(const char* first, const char* second) {
+    char* i = first;
+    char* j = second;
+
+    while(*i != '\0' || *j != '\0' ) {
+        if(*i != *j) {
+            return FALSE;
+        }
+        i++;
+        j++;
+    }
+	return TRUE;
+}
+
+int count_params(char* string, char delimiter, int fix_turn) {
+	int position,count;
+
+	position = 0;
+	count = 0;
+	while(string[position] != '\0') {
+		if(string[position] == delimiter) {
+			count++;
+		}
+		else if(fix_turn && (string[position] == '\n' || string[position] == '\r')) {
+			string[position] = '\0';
+		}
+		position++;
+	}
+	return count+1;
+}
