@@ -102,7 +102,7 @@ function:
 
 */
 
-int is_same(const char* first, const char* second);
+int is_same(char* first, const char* second);
 
 /* ------------------------------------------------------------------------------
 
@@ -114,4 +114,4 @@ function:
 	- return: number of parameters 
 */
 
-int count_params(char* string, char delimiter, int fix_turn);
+int count_params(char* string, char delimiter);

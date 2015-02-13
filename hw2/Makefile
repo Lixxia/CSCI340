@@ -1,10 +1,10 @@
 CC=gcc
-CFLAGS=-c
+CFLAGS=-c -g -Wall
 
 all: hw2
 
 hw2: shell.o hw2.o
-	$(CC) shell.o hw2.o -o hw2
+	$(CC) -g shell.o hw2.o -o hw2
 
 shell.o: shell.c
 	$(CC) $(CFLAGS) shell.c

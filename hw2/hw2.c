@@ -10,18 +10,19 @@
 // Main function 
 // Arguments:	argc = number of arguments suppled by user
 //				argv = array of argument values
+//
 
 int main( int argc, char** argv ) {
-	char line[CMD_LENGTH];
-	command_t cmd;
 	int done;
-
 	done = FALSE;
 
 	while (!done) {
+		char line[CMD_LENGTH];
+		char fullpath[PATH_LENGTH]; 
+		command_t cmd;
+
 		printf("\nInput a command ");
 		fgets(line, CMD_LENGTH, stdin);
-   		printf("Entered: %s", line);
 
    		parse(line,&cmd);
 
@@ -31,14 +32,12 @@ int main( int argc, char** argv ) {
    		else if (is_builtin(&cmd)) {
    			do_builtin(&cmd);
    		}
-   		else {
+   		else if (find_fullpath(fullpath, &cmd)) {
    			execute(&cmd);
    		}
-   		// else {
-   		// 	// execute(&cmd);
-   		// 	// printf("executed");
-   		// 	perror();
-   		// }
+   		else {
+   			perror("Error in main:");
+   		}
    		cleanup(&cmd);
 	}
 
