@@ -28,7 +28,7 @@ void parse( char* line, command_t* p_cmd ) {
 		if(line[i] == ' ') {
 			numArgs++;
 		}
-		if(line[i] == '\n' || line[i] == '\r') {
+		else if(line[i] == '\n' || line[i] == '\r') {
 			line[i] = '\0';
 		}
 
@@ -70,7 +70,7 @@ void parse( char* line, command_t* p_cmd ) {
 	p_cmd -> argv[n] = '\0';
 
 	// malloc name and get value from argv
-	p_cmd -> name = (char*) malloc((numArgs+1)*sizeof(char));
+	p_cmd -> name = (char*) malloc(100);
 	p_cmd -> name = p_cmd[0].argv[0];
 	printf("\nEND PARSE");
 }
@@ -171,8 +171,6 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 
 int is_builtin( command_t* p_cmd ) {
 	printf("\n BEGIN ISBUILTIN");
-	// p_cmd -> name;
-	// valid_builtin_commands
 	int numBuiltin, n, i, found;
 	char* cmd = p_cmd -> name;
 
@@ -190,9 +188,11 @@ int is_builtin( command_t* p_cmd ) {
 				found = FALSE;
 				printf("diff");
 			}
+			printf("\ntestchar '%c'\n",cmd[i]);
 			i++;
 		}
-		if(found == 1) {
+		printf("\ntestchar2 '%c'\n",valid_builtin_commands[n][i]);
+		if(found == TRUE && valid_builtin_commands[n][i] == '\0') {
 			break;
 		}
 	}
@@ -221,7 +221,7 @@ int do_builtin( command_t* p_cmd ) {
 	}
 	else {
 		status=ERROR;
-		perror("Something went wrong in builtin.");
+		perror("Something went wrong in do_builtin.");
 	}
 	printf("\n END DOBUILTIN");
 
@@ -230,13 +230,14 @@ int do_builtin( command_t* p_cmd ) {
 
 void cleanup( command_t* p_cmd ) {
 	printf("\n BEGIN CLEANUP");
-	int i;
+	int i, numArgs;
+	numArgs = p_cmd -> argc;
 
-    for ( i = 0; p_cmd -> argv[i]; i++ ) {
-    	free( p_cmd -> argv[i] );
+    for ( i = 0; i<numArgs; i++ ) {
+    	free(p_cmd -> argv[i]);
     }
     free(p_cmd -> argv);
-    free(p_cmd -> name);
+    // free(p_cmd -> name);
     printf("\n END CLEANUP");
 }
 
