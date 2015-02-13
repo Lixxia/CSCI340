@@ -17,31 +17,21 @@
 // --------------------------------------------
 const char* valid_builtin_commands[] = {"cd", "exit", NULL};
 
-// --------------------------------------------
-// Implementation for each prototype below
-// --------------------------------------------
-
-
 void parse( char* line, command_t* p_cmd ) {
+	printf("\nBEGIN PARSE");
 	int numArgs, i, n, j, tokenLength,stringPos,tokenStart;
-	// find . -name hw2.c -print
-	// name = name of command
-	// argc = number of arguments = 5
-	// argv = pointer to array of strings. = "find" "." "-name" "hw2.c" "-print" "NULL" <- important for last spot
-	// find . -name hw2.c -print
-
-	//have to malloc for name
-	//have to create array for argv
-	// loop arc times, each time mallocing space for parameters
 
 	// make this a countParams function?
 	numArgs=0;
 	i=0;
-	while(line[i] != '\n') {
-		printf("%c", line[i]);
+	while(line[i] != '\0') {
 		if(line[i] == ' ') {
 			numArgs++;
 		}
+		if(line[i] == '\n' || line[i] == '\r') {
+			line[i] = '\0';
+		}
+
 		i++;
 	}
 
@@ -66,7 +56,6 @@ void parse( char* line, command_t* p_cmd ) {
 			p_cmd -> argv[n] = malloc((tokenLength+1)*sizeof(char));
 			tokenStart=stringPos-tokenLength;
 			j=0;
-			printf("val of j: %i",j);
 			while(j < tokenLength) {
 				p_cmd -> argv[n][j] = line[tokenStart]; // get jth char of argv[n]
 				j++;
@@ -78,29 +67,23 @@ void parse( char* line, command_t* p_cmd ) {
 
 		stringPos++; //to move to the next section - skip whitespace
 	}
-	p_cmd -> argv[n+1] = NULL;
-	
-	// printf("argv : %s",p_cmd[0].argv[0]);
-	// printf("argv 2: %s", p_cmd[0].argv[1]);
-	// printf("argv 3: %s",p_cmd[0].argv[2]);
-	// printf("argv 4: %s", p_cmd[0].argv[3]);
+	p_cmd -> argv[n] = '\0';
 
-	//malloc name 
+	// malloc name and get value from argv
 	p_cmd -> name = (char*) malloc((numArgs+1)*sizeof(char));
 	p_cmd -> name = p_cmd[0].argv[0];
-
+	printf("\nEND PARSE");
 }
 
 int execute( command_t* p_cmd ) {
+	printf("\n BEGIN EXECUTE");
 	int found = FALSE;
 	int childStatus;
-	char fullpath[200]; 
+	char fullpath[PATH_LENGTH]; 
 
 	found = find_fullpath(fullpath,p_cmd);
 
-	printf("\nfullpath=== %s\n",fullpath);
-
-	if(found) {
+	if(found == 1) {
 		if( fork() == 0 ) { 
 			//child process
 			execv(fullpath, p_cmd->argv);
@@ -113,12 +96,12 @@ int execute( command_t* p_cmd ) {
 	else {
 		printf("Command not found.");
 	}
-
+	printf("\n END EXECUTE");
 	return childStatus;
-
 }
 
 int find_fullpath( char* fullpath, command_t* p_cmd ) {
+	printf("\n BEGIN FIND FP");
 	int i, numPaths, n, position, length, start, j, namePos, exists;
 	struct stat buffer;
 
@@ -131,17 +114,14 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 	numPaths=0;
 	i=0;
 	while(env_path[i] != '\0') {
-		printf("%c", env_path[i]);
 		if(env_path[i] == ':') {
 			numPaths++;
 		}
 		i++;
 	}
 	numPaths++;
-	// printf("num paths: %i", numPaths);
 
 	position = 0;
-	
 	for(n=0; n < numPaths; n++) {
 		length = 0;
 		while(env_path[position] != ':' && env_path[position] != '\0') {
@@ -172,61 +152,91 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 		position++; //move to next path variable
 
 		exists = stat( fullpath, &buffer );
-		if ( exists == 0 && ( S_IFDIR & buffer.st_mode ) ) {
-			printf("\nDirectory Exists.");
-		} 
-		else if ( exists == 0 && ( S_IFREG & buffer.st_mode ) ) {
+		// if ( exists == 0 && ( S_IFDIR & buffer.st_mode ) ) {
+		// 	printf("\nDirectory Exists.");
+		// } 
+		if ( exists == 0 && ( S_IFREG & buffer.st_mode ) ) {
 			pathFound = TRUE;
-			// set fullpath = fullpath;
-
-			// fullpath[0] = fullpath[0];
 			printf("\nFile Exists.");
 			break;
 		} 
 		else {
-			printf("\nNot a valid file or directory.");
+			printf("\nNot a valid file.");
 		}
-
 	}
 
-	printf("\nfinal fullpath: %s",fullpath);
+	printf("\n END FIND FP");
 	return pathFound;
 }
 
-
-/* ------------------------------------------------------------------------------
-
-This function will determine if command (cmd for short) entered in the shell by 
-the user is a valid builtin command.
-
-HINT(s): Use valid_builtin_commands array defined in shell.c
-
-function:
-	- parameter(s): pointer to a command_t structure
-	- return: TRUE if the cmd is in array, else FALSE if not in array. 
-
-*/
-
 int is_builtin( command_t* p_cmd ) {
+	printf("\n BEGIN ISBUILTIN");
 	// p_cmd -> name;
 	// valid_builtin_commands
-	printf("\nsize of thing: %f",sizeof(valid_builtin_commands));
+	int numBuiltin, n, i, found;
+	char* cmd = p_cmd -> name;
 
-	// while(p_cmd ->)
-	return 0;
+	numBuiltin = (sizeof(valid_builtin_commands)/sizeof(*valid_builtin_commands))-1;
+	found = FALSE;
+	
+	for(n=0;n<numBuiltin;n++) {
+		i=0;
+		while(cmd[i] != '\0') {
+			if(cmd[i] == valid_builtin_commands[n][i]) {
+				found = TRUE;
+				printf("same");
+			}
+			else {
+				found = FALSE;
+				printf("diff");
+			}
+			i++;
+		}
+		if(found == 1) {
+			break;
+		}
+	}
 
+	printf("\n END ISBUILTIN");
+
+	return found;
 }
 
 int do_builtin( command_t* p_cmd ) {
-	return 0;
+	printf("\n BEGIN DOBUILTIN");
+	int status;
 
+	if(p_cmd -> name[0] == 'c') {
+		status = chdir(p_cmd -> argv[1]);
+		if(status == 0) {
+			printf("Changed directory to: %s",p_cmd -> argv[1]);
+		}
+		else if(status == -1) {
+			perror("Error in builtin.");
+		}
+	}
+	else if (p_cmd -> name[0] == 'e') {
+		status=SUCCESSFUL;
+		printf("Exiting process.");
+	}
+	else {
+		status=ERROR;
+		perror("Something went wrong in builtin.");
+	}
+	printf("\n END DOBUILTIN");
+
+	return status;
 }
 
 void cleanup( command_t* p_cmd ) {
-	//free until NULL 
-	// free up anything that's been malloc'd
-	// free();
+	printf("\n BEGIN CLEANUP");
+	int i;
 
-	//where to free fullpath
+    for ( i = 0; p_cmd -> argv[i]; i++ ) {
+    	free( p_cmd -> argv[i] );
+    }
+    free(p_cmd -> argv);
+    free(p_cmd -> name);
+    printf("\n END CLEANUP");
 }
 

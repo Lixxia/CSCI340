@@ -37,17 +37,35 @@ int main( int argc, char** argv ) {
 	// 		cleanup( ... )
 	//
 
-	char line[100];
+	char line[CMD_LENGTH];
 	command_t cmd;
+	int done;
 
-	printf("Input a command ");
-   	fgets(line, 100, stdin);
-   	printf("Entered: %s", line);
+	done = FALSE;
 
-	parse(line,&cmd);
+	while (!done) {
+		printf("\nInput a command ");
+		fgets(line, CMD_LENGTH, stdin);
+   		printf("Entered: %s", line);
 
-	// execute(&cmd);
-	is_builtin(&cmd);
+   		parse(line,&cmd);
+
+   		if (is_builtin(&cmd) && cmd.name[0] == 'e') {
+   			done = TRUE;
+   		}
+   		else if (is_builtin(&cmd)) {
+   			do_builtin(&cmd);
+   		}
+   		else {
+   			execute(&cmd);
+   		}
+   		// else {
+   		// 	// execute(&cmd);
+   		// 	// printf("executed");
+   		// 	perror();
+   		// }
+   		cleanup(&cmd);
+	}
 
 	return 0;
 

@@ -5,6 +5,9 @@
 #define TRUE 1
 #define FALSE 0
 
+#define PATH_LENGTH 200
+#define CMD_LENGTH 100
+
 typedef struct {
 	
 	char* name;		// name of command (must malloc)
