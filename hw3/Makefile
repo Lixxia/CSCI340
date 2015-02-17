@@ -1,22 +1,22 @@
 CC=gcc
 CFLAGS=-c -g -Wall
 
-all: hw2
+all: hw3
 
-hw2: shell.o hw2.o
-	$(CC) -g shell.o hw2.o -o hw2
+hw3: shell.o hw3.o
+	$(CC) -g shell.o hw3.o -o hw3
 
 shell.o: shell.c
 	$(CC) $(CFLAGS) shell.c
 
-hw2.o:	hw2.c
-	$(CC) $(CFLAGS) hw2.c
+hw3.o:	hw3.c
+	$(CC) $(CFLAGS) hw3.c
 
 clean:
-	/bin/rm -f hw2 *.o *.gz
+	/bin/rm -f hw3 *.o *.gz
 
 run:
-	./hw2
+	./hw3
 
 tarball:
 	tar -cvzf barber.tar.gz *

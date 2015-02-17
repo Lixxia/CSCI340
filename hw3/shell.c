@@ -57,11 +57,36 @@ void parse( char* line, command_t* p_cmd ) {
 }
 
 int execute( command_t* p_cmd ) {
+	// modify this for use with pipe!
+	int fds[2]; // input = fds[0], output = fds[1]
+	pid_t cpid1, cpid2;
+
 	int found = FALSE;
-	int childStatus,pid;
+	int childStatus, pid;
 	char fullpath[PATH_LENGTH]; 
 
 	found = find_fullpath(fullpath,p_cmd);
+
+	pipe(fds);
+
+	// if ( cpid1 = fork() == 0 ) {
+	// 	close(1);
+	// 	dup(fds[1]);
+	// 	close(fds[0]);
+	// 	execv(fullpath,pargs);
+	// }
+
+	// if (cpid2 = fork() == 0 ) {
+	// 	close(0);
+	// 	dup(fds[0]);
+	// 	close(fds[1]);
+	// 	execv(fullpath,cargs);
+	// }
+	// // also wait on cpid1
+	// waitpid(cpid1, &childStatus, 0);
+	// waitpid(cpid2, &childStatus, 0);
+	// return 0;
+	
 
 	if(found == 1) {
 		pid = fork();
@@ -207,3 +232,41 @@ int count_params(char* string, char delimiter) {
 	}
 	return count+1;
 }
+
+
+int split_args(command_t* p_cmd, char* pargs, char* cargs) {
+	// take remaining argv up to NULL and assign them to cargs
+	int n, i;
+
+
+	for(n=0; n < p_cmd -> argc; n++) {
+		// take all argv up to | and assign them to pargs
+		i=0;
+		while(p_cmd -> argv[n][0] != '|' && p_cmd -> argv[n] != NULL) {
+			pargs[n][i] = p_cmd -> argv[n][i];
+		}
+	}
+
+	// argv i-1 first chunk ; argv i+1 second chunk
+
+	// p_cmd -> name = (char*) malloc(100);
+	// for (n = 0; p_cmd->argv[0][n] != '\0'; n++) {
+	// 	p_cmd->name[n] = p_cmd->argv[0][n];	
+	// }
+	// p_cmd->name[n] = '\0';
+}
+
+
+/*
+	NOTES:
+	=====
+
+	Every process has its own file descriptor table
+	every file you open gets added to that table
+	there are 3 initial ones: stin, stdout, sterr
+
+	Can change any of these 3 by closing and duping 
+	or opening something -> will populate into the 
+	table at that spot.
+
+*/
