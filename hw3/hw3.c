@@ -26,18 +26,18 @@ int main( int argc, char** argv ) {
 
    		parse(line,&cmd);
 
-   		if (is_builtin(&cmd) && cmd.name[0] == 'e') {
-   			done = TRUE;
-   		}
-   		else if (is_builtin(&cmd)) {
-   			do_builtin(&cmd);
-   		}
-   		else if (find_fullpath(fullpath, &cmd)) {
+   		// if (is_builtin(&cmd) && cmd.name[0] == 'e') {
+   		// 	done = TRUE;
+   		// }
+   		// else if (is_builtin(&cmd)) {
+   		// 	do_builtin(&cmd);
+   		// }
+   		// else if (find_fullpath(fullpath, &cmd)) {
    			execute(&cmd);
-   		}
-   		else {
-   			perror("Error in main:");
-   		}
+   		// }
+   		// else {
+   		// 	perror("Error in main:");
+   		// }
    		cleanup(&cmd);
 	}
 

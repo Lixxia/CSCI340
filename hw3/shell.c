@@ -61,13 +61,48 @@ int execute( command_t* p_cmd ) {
 	int fds[2]; // input = fds[0], output = fds[1]
 	pid_t cpid1, cpid2;
 
+	char** pargs;
+	char** cargs;
+
 	int found = FALSE;
-	int childStatus, pid;
+	int childStatus, pid, i;
 	char fullpath[PATH_LENGTH]; 
+
+	// pargs = (char**) malloc((p_cmd -> argc)*sizeof(char*));
+	// cargs = (char**) malloc((p_cmd -> argc)*sizeof(char*));
+	// for (i=0;i<p_cmd -> argc;i++) {
+	// 	pargs[i] = malloc((100)*sizeof(char));
+	// 	cargs[i] = malloc((100)*sizeof(char));
+	// }
+	/*
+	char* save_pipe;
+	char** argv2;
+
+	argv2 = p_cmd -> argv + i + 1;
+	save_pipe = p_cmd -> argv[i];
+	p_cmd -> argv[i] = NULL;
+
+	//before parent leaves execute
+	p_cmd -> argv[i] = save_pipe;
+
+	==============================
+	char fullpath[];
+	cmd_t cmd2;
+	cmd2.name = argv2[0];
+	find_fullpath(fullpath,&cmd2);
+	*/
 
 	found = find_fullpath(fullpath,p_cmd);
 
-	pipe(fds);
+	// split_args(p_cmd,pargs,cargs);
+	printf("\n pipe location= %i",find_pipe(p_cmd));
+
+	// printf("\n pargs[0]=%s",pargs[0]);
+	// printf("\n pargs[1]=%s",pargs[1]);
+	// printf("\n cargs[0]=%s",cargs[0]);
+	// printf("\n cargs[1]=%s",cargs[1]);
+
+	// pipe(fds);
 
 	// if ( cpid1 = fork() == 0 ) {
 	// 	close(1);
@@ -83,6 +118,8 @@ int execute( command_t* p_cmd ) {
 	// 	execv(fullpath,cargs);
 	// }
 	// // also wait on cpid1
+	// close(fds[0]);
+	// close(fds[1]);
 	// waitpid(cpid1, &childStatus, 0);
 	// waitpid(cpid2, &childStatus, 0);
 	// return 0;
@@ -100,6 +137,14 @@ int execute( command_t* p_cmd ) {
 	else {
 		printf("Command not found.");
 	}
+
+	// for (i=0;i<p_cmd -> argc;i++) {
+	// 	free(pargs[i]);
+	// 	free(cargs[i]);
+	// }
+	// free(pargs);
+	// free(cargs);
+
 	return childStatus;
 }
 
@@ -107,7 +152,6 @@ int find_fullpath( char* fullpath, command_t* p_cmd ) {
 	int numPaths, n, position, length, start, j, namePos, exists;
 	struct stat buffer;
 
-	// char* cmd = p_cmd -> name;
 	int pathFound = FALSE;
 	char* env_path = getenv("PATH");
 
@@ -233,27 +277,58 @@ int count_params(char* string, char delimiter) {
 	return count+1;
 }
 
+int find_pipe(command_t* p_cmd) {
+	int location;
 
-int split_args(command_t* p_cmd, char* pargs, char* cargs) {
-	// take remaining argv up to NULL and assign them to cargs
-	int n, i;
+	location = 0;
+	while(p_cmd -> argv[location] != '|' && p_cmd -> argv[location] != NULL) {
+		if(p_cmd -> argv[location][0] == '|') {
+			return location;
+		}
+		location ++;
+	}
+	return 0;
+}
 
+int split_args(command_t* p_cmd, char **pargs, char **cargs) {
+	int n, i, section, pos;
 
+	section = 1; // before pipe and after pipe
+	pos=0;
 	for(n=0; n < p_cmd -> argc; n++) {
 		// take all argv up to | and assign them to pargs
 		i=0;
-		while(p_cmd -> argv[n][0] != '|' && p_cmd -> argv[n] != NULL) {
-			pargs[n][i] = p_cmd -> argv[n][i];
+
+		// First set of arguments
+		if(section == 1) {
+			while(p_cmd -> argv[n][i] != '|' && p_cmd -> argv[n][i] != '\0') {
+				pargs[n][i] = p_cmd->argv[n][i];
+				i++;
+			}
+			pos++;
+			pargs[n][i] = '\0';
+		}
+		// Check for pipe and advance in argv
+		if(p_cmd -> argv[n][i] == '|') {
+				section = 2;
+				printf("pipe here");
+				n++;
+		}
+
+		// Second set of arguments
+		if(section == 2) {
+			// use pos to move back to the beginning of array for cargs
+			while(p_cmd -> argv[n][i] != '\0') {
+				cargs[n-pos][i] = p_cmd->argv[n][i];
+				i++;
+			}
+			cargs[n-pos][i] = '\0';
 		}
 	}
+	pargs[n] = NULL;
+	cargs[n-pos] = NULL;
 
-	// argv i-1 first chunk ; argv i+1 second chunk
-
-	// p_cmd -> name = (char*) malloc(100);
-	// for (n = 0; p_cmd->argv[0][n] != '\0'; n++) {
-	// 	p_cmd->name[n] = p_cmd->argv[0][n];	
-	// }
-	// p_cmd->name[n] = '\0';
+	return 0;
 }
 
 
@@ -269,4 +344,19 @@ int split_args(command_t* p_cmd, char* pargs, char* cargs) {
 	or opening something -> will populate into the 
 	table at that spot.
 
+	char* save_pipe;
+	char** argv2;
+
+	argv2 = p_cmd -> argv + i + 1;
+	save_pipe = p_cmd -> argv[i];
+	p_cmd -> argv[i] = NULL;
+
+	//before parent leaves execute
+	p_cmd -> argv[i] = save_pipe;
+
+	==============================
+	char fullpath[];
+	cmd_t cmd2;
+	cmd2.name = argv2[0];
+	find_fullpath(fullpath,&cmd2);
 */
