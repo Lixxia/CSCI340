@@ -57,93 +57,73 @@ void parse( char* line, command_t* p_cmd ) {
 }
 
 int execute( command_t* p_cmd ) {
-	// modify this for use with pipe!
 	int fds[2]; // input = fds[0], output = fds[1]
 	pid_t cpid1, cpid2;
+	command_t cmd_second;
 
-	char** pargs;
-	char** cargs;
+	char* save_pipe;
+	char** argv_second;
 
 	int found = FALSE;
-	int childStatus, pid, i;
+	int childStatus, pid, pipe_found;
 	char fullpath[PATH_LENGTH]; 
+	char fullpath_second[PATH_LENGTH];
 
-	// pargs = (char**) malloc((p_cmd -> argc)*sizeof(char*));
-	// cargs = (char**) malloc((p_cmd -> argc)*sizeof(char*));
-	// for (i=0;i<p_cmd -> argc;i++) {
-	// 	pargs[i] = malloc((100)*sizeof(char));
-	// 	cargs[i] = malloc((100)*sizeof(char));
-	// }
-	/*
-	char* save_pipe;
-	char** argv2;
-
-	argv2 = p_cmd -> argv + i + 1;
-	save_pipe = p_cmd -> argv[i];
-	p_cmd -> argv[i] = NULL;
-
-	//before parent leaves execute
-	p_cmd -> argv[i] = save_pipe;
-
-	==============================
-	char fullpath[];
-	cmd_t cmd2;
-	cmd2.name = argv2[0];
-	find_fullpath(fullpath,&cmd2);
-	*/
-
-	found = find_fullpath(fullpath,p_cmd);
-
-	// split_args(p_cmd,pargs,cargs);
-	printf("\n pipe location= %i",find_pipe(p_cmd));
-
-	// printf("\n pargs[0]=%s",pargs[0]);
-	// printf("\n pargs[1]=%s",pargs[1]);
-	// printf("\n cargs[0]=%s",cargs[0]);
-	// printf("\n cargs[1]=%s",cargs[1]);
-
-	// pipe(fds);
-
-	// if ( cpid1 = fork() == 0 ) {
-	// 	close(1);
-	// 	dup(fds[1]);
-	// 	close(fds[0]);
-	// 	execv(fullpath,pargs);
-	// }
-
-	// if (cpid2 = fork() == 0 ) {
-	// 	close(0);
-	// 	dup(fds[0]);
-	// 	close(fds[1]);
-	// 	execv(fullpath,cargs);
-	// }
-	// // also wait on cpid1
-	// close(fds[0]);
-	// close(fds[1]);
-	// waitpid(cpid1, &childStatus, 0);
-	// waitpid(cpid2, &childStatus, 0);
-	// return 0;
+	pipe_found = find_pipe(p_cmd);
 	
+	if(pipe_found != 0) {
+		// pipe char exists
+		argv_second = p_cmd -> argv + pipe_found + 1;
+		save_pipe = p_cmd -> argv[pipe_found];
+		p_cmd -> argv[pipe_found] = NULL;
 
-	if(found == 1) {
-		pid = fork();
-		if( pid == 0 ) { 
-			//child process
-			execv(fullpath, p_cmd->argv);
-			perror("Execute terminated with an error condition!\n");
+		cmd_second.name = argv_second[0];
+
+		find_fullpath(fullpath,p_cmd);
+		find_fullpath(fullpath_second,&cmd_second);
+
+		pipe(fds);
+		
+		cpid1 = fork();
+		if ( cpid1 == 0 ) {
+			close(1);
+			dup(fds[1]);
+			close(fds[0]);
+			execv(fullpath,p_cmd->argv);
 		}
-		wait(&childStatus);
-	}
-	else {
-		printf("Command not found.");
+		cpid2 = fork();
+		if ( cpid2 == 0 ) {
+			close(0);
+			dup(fds[0]);
+			close(fds[1]);
+			execv(fullpath_second,argv_second);
+		}
+
+		p_cmd -> argv[pipe_found] = save_pipe;
+		
+		close(fds[0]);
+		close(fds[1]);
+
+		waitpid(cpid1, &childStatus, 0);
+		waitpid(cpid2, &childStatus, 0);
 	}
 
-	// for (i=0;i<p_cmd -> argc;i++) {
-	// 	free(pargs[i]);
-	// 	free(cargs[i]);
-	// }
-	// free(pargs);
-	// free(cargs);
+	else {
+		found = find_fullpath(fullpath,p_cmd);
+		// proceed normally
+		if(found == 1) {
+			pid = fork();
+			if( pid == 0 ) { 
+				//child process
+				execv(fullpath, p_cmd->argv);
+				perror("Execute terminated with an error condition!\n");
+			}
+			wait(&childStatus);
+		}
+		else {
+			printf("Command not found.");
+		}
+	}
 
 	return childStatus;
 }
@@ -289,74 +269,3 @@ int find_pipe(command_t* p_cmd) {
 	}
 	return 0;
 }
-
-int split_args(command_t* p_cmd, char **pargs, char **cargs) {
-	int n, i, section, pos;
-
-	section = 1; // before pipe and after pipe
-	pos=0;
-	for(n=0; n < p_cmd -> argc; n++) {
-		// take all argv up to | and assign them to pargs
-		i=0;
-
-		// First set of arguments
-		if(section == 1) {
-			while(p_cmd -> argv[n][i] != '|' && p_cmd -> argv[n][i] != '\0') {
-				pargs[n][i] = p_cmd->argv[n][i];
-				i++;
-			}
-			pos++;
-			pargs[n][i] = '\0';
-		}
-		// Check for pipe and advance in argv
-		if(p_cmd -> argv[n][i] == '|') {
-				section = 2;
-				printf("pipe here");
-				n++;
-		}
-
-		// Second set of arguments
-		if(section == 2) {
-			// use pos to move back to the beginning of array for cargs
-			while(p_cmd -> argv[n][i] != '\0') {
-				cargs[n-pos][i] = p_cmd->argv[n][i];
-				i++;
-			}
-			cargs[n-pos][i] = '\0';
-		}
-	}
-	pargs[n] = NULL;
-	cargs[n-pos] = NULL;
-
-	return 0;
-}
-
-
-/*
-	NOTES:
-	=====
-
-	Every process has its own file descriptor table
-	every file you open gets added to that table
-	there are 3 initial ones: stin, stdout, sterr
-
-	Can change any of these 3 by closing and duping 
-	or opening something -> will populate into the 
-	table at that spot.
-
-	char* save_pipe;
-	char** argv2;
-
-	argv2 = p_cmd -> argv + i + 1;
-	save_pipe = p_cmd -> argv[i];
-	p_cmd -> argv[i] = NULL;
-
-	//before parent leaves execute
-	p_cmd -> argv[i] = save_pipe;
-
-	==============================
-	char fullpath[];
-	cmd_t cmd2;
-	cmd2.name = argv2[0];
-	find_fullpath(fullpath,&cmd2);
-*/

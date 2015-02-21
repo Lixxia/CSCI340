@@ -115,3 +115,14 @@ function:
 */
 
 int count_params(char* string, char delimiter);
+
+/* ------------------------------------------------------------------------------
+
+This function is used to locate a pipe within the argv array.
+ 
+function:
+	- parameter(s): pointer to a command_t struct
+	- return: 0 if pipe does not exist, otherwise location of pipe character in array 
+*/
+
+int find_pipe(command_t* p_cmd);
