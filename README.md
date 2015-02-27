@@ -17,4 +17,11 @@ Once these values were read in, the following would be printed out to the consol
 This assignment called for us to write a small shell for the linux kernel. It would accept basic commands from the user, check if they were built in (cd and exit) or look for the fullpath and execute it using a child process.
 
 ## HW3
-This assignment extended the previous one (HW3). Using the existing code from HW2 I added pipe functionality to my shell. 
+This assignment extended the previous one (HW3). Using the existing code from HW2 I added pipe functionality to my shell.
+
+## HW4
+Again building upon the previous two assignments. In addition to the system and standard library functions used in assignments 2 and 3, this assignment will also use the system and standard library functions listed below:
+
+- Duplicate a file desciptor: `int dup2(int oldfd, int newfd)`
+- Create/open a new file descriptor: `int open(const char* pathname, int flags, mode_t mode)`
+- signals: `sighandler_t signal(int signum, sighandler_t handler)`
