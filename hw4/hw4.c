@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <fcnt1.h>
+#include <signal.h>
 #include "shell.h"
 
 // -----------------------------------

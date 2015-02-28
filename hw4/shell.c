@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcnt1.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -56,6 +58,16 @@ void parse( char* line, command_t* p_cmd ) {
 	p_cmd->name[n] = '\0';
 }
 
+/*
+HW4 Tasks:
+(within execute)
+fork a child process that runs in the background. This operation can be identified by determining
+if an ampersand (&) is the last element in the command struct argv array. 
+
+Redirect stdin to a text file. This operation can be identified by determining if a greater than '>'
+is present in the command struct argv array. 
+
+*/
 int execute( command_t* p_cmd ) {
 	int fds[2]; // input = fds[0], output = fds[1]
 	pid_t cpid1, cpid2;
@@ -269,3 +281,10 @@ int find_pipe(command_t* p_cmd) {
 	}
 	return 0;
 }
+
+// int find_pipe(command_t* p_cmd){}
+
+/*
+add a SIGCHLD signal handler function (prototype and implementation) in the hw2.c that is able to 
+asynchronously reclaim (or reap) a forked child process that has terminated normally.
+*/
