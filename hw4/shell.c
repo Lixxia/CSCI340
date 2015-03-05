@@ -294,3 +294,16 @@ int find_pipe(command_t* p_cmd) {
 add a SIGCHLD signal handler function (prototype and implementation) in the hw2.c that is able to 
 asynchronously reclaim (or reap) a forked child process that has terminated normally.
 */
+
+static void sig_int_handler(int sig) {
+	printf("In SIGINT handler\n");
+	exit(0);
+}
+static void sig_child_handler(int sig) {
+	printf("In SIGCHLD handler\n");
+	int status;
+	pid_t pid;
+	while (( pid = waitpid(-1, &status, WNOHANG )) != -1 ) {
+		printf("Child Process (%d) has Terminated\n", pid );
+	}
+}
