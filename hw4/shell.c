@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcnt1.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -76,12 +76,20 @@ int execute( command_t* p_cmd ) {
 	char* save_pipe;
 	char** argv_second;
 
-	int found = FALSE;
-	int childStatus, pid, pipe_found;
+	int found, childStatus, pid, pipe_found, last, background;
 	char fullpath[PATH_LENGTH]; 
 	char fullpath_second[PATH_LENGTH];
 
+	background = FALSE;
+	found = FALSE;
+	last = p_cmd->argc - 1;
 	pipe_found = find_pipe(p_cmd);
+
+	// check for &
+	if(p_cmd -> argv[last][0] == '&') {
+		printf("yep\n");
+		background = TRUE;
+	}
 	
 	if(pipe_found != 0) {
 		// pipe char exists
@@ -281,8 +289,6 @@ int find_pipe(command_t* p_cmd) {
 	}
 	return 0;
 }
-
-// int find_pipe(command_t* p_cmd){}
 
 /*
 add a SIGCHLD signal handler function (prototype and implementation) in the hw2.c that is able to 

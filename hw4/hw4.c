@@ -4,11 +4,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <fcnt1.h>
+#include <fcntl.h>
 #include <signal.h>
 #include "shell.h"
 
-// -----------------------------------
+// -----------------------------------0
 // Main function 
 // Arguments:	argc = number of arguments suppled by user
 //				argv = array of argument values
