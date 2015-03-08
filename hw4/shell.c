@@ -70,7 +70,7 @@ is present in the command struct argv array.
 */
 int execute( command_t* p_cmd ) {
 	int fds[2]; // input = fds[0], output = fds[1]
-	pid_t cpid1, cpid2;
+	pid_t bpid, cpid1, cpid2;
 	command_t cmd_second;
 
 	char* save_pipe;
@@ -87,8 +87,36 @@ int execute( command_t* p_cmd ) {
 
 	// check for &
 	if(p_cmd -> argv[last][0] == '&') {
+		// background process
+		// need struct without &, use same method as pipe split?
+		
 		printf("yep\n");
 		background = TRUE;
+
+		if (signal(SIGCHILD, sig_child_handler) == SIG_ERR) {
+		    perror("unable to create new SIGCHILD signal handler");
+		    exit(-1);
+		}
+
+		if (signal(SIGINT, sig_int_handler) == SIG_ERR) {
+		    perror("Unable to create new SIGINT signal handler");
+		    exit(-1);
+		}
+
+		bpid = fork();
+
+		if (pid == 0) {
+		    execv(fullpath, argv);
+		    perror("Child process terminated in error condition");
+		    exit(-1);
+		}
+
+		// loop that sleeps every second
+		while(1) {
+		    printf("parent is working \n");
+		    sleep(1);
+		}
+		return 0;
 	}
 	
 	if(pipe_found != 0) {
@@ -299,6 +327,7 @@ static void sig_int_handler(int sig) {
 	printf("In SIGINT handler\n");
 	exit(0);
 }
+
 static void sig_child_handler(int sig) {
 	printf("In SIGCHLD handler\n");
 	int status;
