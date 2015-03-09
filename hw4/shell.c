@@ -70,13 +70,15 @@ is present in the command struct argv array.
 */
 int execute( command_t* p_cmd ) {
 	int fds[2]; // input = fds[0], output = fds[1]
-	pid_t bpid, cpid1, cpid2;
+	pid_t bpid, fdcpid, cpid1, cpid2;
 	command_t cmd_second;
 
 	char* save_pipe;
 	char** argv_second;
 
 	int found, childStatus, pid, pipe_found, last, background;
+	int fdchild_process_status;
+	int outfile;
 	char fullpath[PATH_LENGTH]; 
 	char fullpath_second[PATH_LENGTH];
 
@@ -117,6 +119,29 @@ int execute( command_t* p_cmd ) {
 		    sleep(1);
 		}
 		return 0;
+	}
+
+	// need to check for '>'
+	if(bop) {
+		// stdin redirect to file
+		/* need location of '>', save and change to NULL
+		get file name, should be last item in argv
+		*/
+
+		outfile = open("filename.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP );
+
+		if (outfile == -1) {
+		    fprintf(stderr, "Failed to open file.\n");
+		}
+		fdcpid = fork();
+		else if ( fdcpid == 0) {
+		    dup2(outfile,1);
+		    execv(fullpath, argv);
+		    exit(-1);
+		}
+
+		close(outfile);
+		waitpid(fdcpid, &fdchild_process_status, 0);
 	}
 	
 	if(pipe_found != 0) {
