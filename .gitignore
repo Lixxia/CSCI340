@@ -1,3 +1,4 @@
 *.pdf
 *.tgz
 *.tar.gz
+*.o
