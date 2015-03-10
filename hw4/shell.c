@@ -74,6 +74,8 @@ int execute( command_t* p_cmd ) {
 	command_t cmd_second;
 
 	char* save_pipe;
+	char* save_amp;
+	char* save_angle;
 	char** argv_second;
 
 	int found, childStatus, pid, pipe_found, last, background;
@@ -81,6 +83,8 @@ int execute( command_t* p_cmd ) {
 	int outfile;
 	char fullpath[PATH_LENGTH]; 
 	char fullpath_second[PATH_LENGTH];
+	char fullpath_back[PATH_LENGTH]; 
+	char fullpath_redirect[PATH_LENGTH]; 
 
 	background = FALSE;
 	found = FALSE;
@@ -91,6 +95,10 @@ int execute( command_t* p_cmd ) {
 	if(p_cmd -> argv[last][0] == '&') {
 		// background process
 		// need struct without &, use same method as pipe split?
+		save_amp = p_cmd -> argv[last];
+		p_cmd -> argv[last] = NULL;
+
+		find_fullpath(fullpath_redirect,p_cmd);
 		
 		printf("yep\n");
 		background = TRUE;
@@ -108,7 +116,7 @@ int execute( command_t* p_cmd ) {
 		bpid = fork();
 
 		if (pid == 0) {
-		    execv(fullpath, argv);
+		    execv(fullpath_redirect, argv);
 		    perror("Child process terminated in error condition");
 		    exit(-1);
 		}
@@ -118,17 +126,20 @@ int execute( command_t* p_cmd ) {
 		    printf("parent is working \n");
 		    sleep(1);
 		}
-		return 0;
+
+		p_cmd -> argv[last] = save_amp;
 	}
 
 	// need to check for '>'
-	if(bop) {
+	if(p_cmd -> argv[last-1][0] == '>') {
 		// stdin redirect to file
 		/* need location of '>', save and change to NULL
 		get file name, should be last item in argv
 		*/
+		save_angle = p_cmd -> argv[last-1];
+		p_cmd -> argv[last-1] = NULL;
 
-		outfile = open("filename.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP );
+		outfile = open(p_cmd -> argv[last], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP );
 
 		if (outfile == -1) {
 		    fprintf(stderr, "Failed to open file.\n");
@@ -139,6 +150,8 @@ int execute( command_t* p_cmd ) {
 		    execv(fullpath, argv);
 		    exit(-1);
 		}
+
+		p_cmd -> argv[last-1] = save_angle;
 
 		close(outfile);
 		waitpid(fdcpid, &fdchild_process_status, 0);
