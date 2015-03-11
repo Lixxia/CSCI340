@@ -98,7 +98,7 @@ int execute( command_t* p_cmd ) {
 		save_amp = p_cmd -> argv[last];
 		p_cmd -> argv[last] = NULL;
 
-		find_fullpath(fullpath_redirect,p_cmd);
+		find_fullpath(fullpath_back,p_cmd);
 		
 		printf("yep\n");
 		background = TRUE;
@@ -116,7 +116,7 @@ int execute( command_t* p_cmd ) {
 		bpid = fork();
 
 		if (pid == 0) {
-		    execv(fullpath_redirect, argv);
+		    execv(fullpath_back, argv);
 		    perror("Child process terminated in error condition");
 		    exit(-1);
 		}
@@ -141,13 +141,15 @@ int execute( command_t* p_cmd ) {
 
 		outfile = open(p_cmd -> argv[last], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP );
 
+		find_fullpath(fullpath_redirect,p_cmd);
+
 		if (outfile == -1) {
 		    fprintf(stderr, "Failed to open file.\n");
 		}
 		fdcpid = fork();
 		else if ( fdcpid == 0) {
 		    dup2(outfile,1);
-		    execv(fullpath, argv);
+		    execv(fullpath_redirect, argv);
 		    exit(-1);
 		}
 
