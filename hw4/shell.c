@@ -93,7 +93,9 @@ int execute( command_t* p_cmd ) {
 	pipe_found = find_pipe(p_cmd);
 
 	// check for &
+	printf("we are here\n");
 	if(p_cmd -> argv[last][0] == '&') {
+		printf("the dpero\n %s", p_cmd -> argv[last]);
 		// background process
 		// need struct without &, use same method as pipe split?
 		save_amp = p_cmd -> argv[last];
