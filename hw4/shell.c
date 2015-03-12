@@ -78,7 +78,7 @@ int execute( command_t* p_cmd ) {
 	char* save_angle;
 	char** argv_second;
 
-	int found, childStatus, pid, pipe_found, last, background;
+	int found, childStatus, pid, pipe_found, last, second_last, background;
 	int fdchild_process_status;
 	int outfile;
 	char fullpath[PATH_LENGTH]; 
@@ -89,6 +89,7 @@ int execute( command_t* p_cmd ) {
 	background = FALSE;
 	found = FALSE;
 	last = p_cmd->argc - 1;
+	second_last = last - 1;
 	pipe_found = find_pipe(p_cmd);
 
 	// check for &
@@ -103,8 +104,9 @@ int execute( command_t* p_cmd ) {
 		printf("yep\n");
 		background = TRUE;
 
-		if (signal(SIGCHILD, sig_child_handler) == SIG_ERR) {
-		    perror("unable to create new SIGCHILD signal handler");
+		// catching when child dies
+		if (signal(SIGCHLD, sig_child_handler) == SIG_ERR) {
+		    perror("unable to create new SIGCHLD signal handler");
 		    exit(-1);
 		}
 
@@ -113,31 +115,23 @@ int execute( command_t* p_cmd ) {
 		    exit(-1);
 		}
 
-		bpid = fork();
-
-		if (pid == 0) {
-		    execv(fullpath_back, argv);
+		if ((bpid = fork()) == 0) {
+		    execv(fullpath_back, p_cmd -> argv);
 		    perror("Child process terminated in error condition");
 		    exit(-1);
-		}
-
-		// loop that sleeps every second
-		while(1) {
-		    printf("parent is working \n");
-		    sleep(1);
 		}
 
 		p_cmd -> argv[last] = save_amp;
 	}
 
 	// need to check for '>'
-	if(p_cmd -> argv[last-1][0] == '>') {
+	else if(second_last >= 1 && p_cmd -> argv[second_last][0] == '>') {
 		// stdin redirect to file
 		/* need location of '>', save and change to NULL
-		get file name, should be last item in argv
+		get file name, should be second_lasttem in argv
 		*/
-		save_angle = p_cmd -> argv[last-1];
-		p_cmd -> argv[last-1] = NULL;
+		save_angle = p_cmd -> argv[second_last];
+		p_cmd -> argv[second_last] = NULL;
 
 		outfile = open(p_cmd -> argv[last], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP );
 
@@ -146,20 +140,19 @@ int execute( command_t* p_cmd ) {
 		if (outfile == -1) {
 		    fprintf(stderr, "Failed to open file.\n");
 		}
-		fdcpid = fork();
-		else if ( fdcpid == 0) {
+		else if ((fdcpid = fork()) == 0) {
 		    dup2(outfile,1);
-		    execv(fullpath_redirect, argv);
+		    execv(fullpath_redirect,p_cmd -> argv);
 		    exit(-1);
 		}
 
-		p_cmd -> argv[last-1] = save_angle;
+		p_cmd -> argv[second_last] = save_angle;
 
 		close(outfile);
 		waitpid(fdcpid, &fdchild_process_status, 0);
 	}
 	
-	if(pipe_found != 0) {
+	else if(pipe_found != 0) {
 		// pipe char exists
 		argv_second = p_cmd -> argv + pipe_found + 1;
 		save_pipe = p_cmd -> argv[pipe_found];
