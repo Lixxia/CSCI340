@@ -127,24 +127,3 @@ function:
 
 int find_pipe(command_t* p_cmd);
 
-/* ------------------------------------------------------------------------------
-
-This function is used to handle SIGINT
- 
-function:
-	- parameter(s):
-	- return:  
-*/
-
-static void sig_int_handler(int sig);
-
-/* ------------------------------------------------------------------------------
-
-This function is used to handle SIGCHILD
- 
-function:
-	- parameter(s): 
-	- return:  
-*/
-
-static void sig_child_handler(int sig);

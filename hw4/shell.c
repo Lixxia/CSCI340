@@ -100,17 +100,6 @@ int execute( command_t* p_cmd ) {
 
 		find_fullpath(fullpath_back,p_cmd);
 
-		// catching when child dies
-		if (signal(SIGCHLD, sig_child_handler) == SIG_ERR) {
-		    perror("unable to create new SIGCHLD signal handler");
-		    exit(-1);
-		}
-
-		if (signal(SIGINT, sig_int_handler) == SIG_ERR) {
-		    perror("Unable to create new SIGINT signal handler");
-		    exit(-1);
-		}
-
 		if ((bpid = fork()) == 0) {
 		    execv(fullpath_back, p_cmd -> argv);
 		    perror("Child process terminated in error condition");
@@ -120,12 +109,8 @@ int execute( command_t* p_cmd ) {
 		p_cmd -> argv[last] = save_amp;
 	}
 
-	// need to check for '>'
 	else if(second_last >= 1 && p_cmd -> argv[second_last][0] == '>') {
 		// stdin redirect to file
-		/* need location of '>', save and change to NULL
-		get file name, should be second_lasttem in argv
-		*/
 		save_angle = p_cmd -> argv[second_last];
 		p_cmd -> argv[second_last] = NULL;
 
@@ -345,21 +330,4 @@ int find_pipe(command_t* p_cmd) {
 		location ++;
 	}
 	return 0;
-}
-
-/*
-add a SIGCHLD signal handler function (prototype and implementation) in the hw2.c that is able to 
-asynchronously reclaim (or reap) a forked child process that has terminated normally.
-*/
-
-static void sig_int_handler(int sig) {
-	exit(0);
-}
-
-static void sig_child_handler(int sig) {
-	int status;
-	pid_t pid;
-	while (( pid = waitpid(-1, &status, WNOHANG )) > 0 ) {
-		// printf("Child Process (%d) has Terminated\n", pid );
-	}
 }
