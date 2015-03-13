@@ -78,7 +78,7 @@ int execute( command_t* p_cmd ) {
 	char* save_angle;
 	char** argv_second;
 
-	int found, childStatus, pid, pipe_found, last, second_last, background;
+	int found, childStatus, pid, pipe_found, last, second_last;
 	int fdchild_process_status;
 	int outfile;
 	char fullpath[PATH_LENGTH]; 
@@ -86,25 +86,19 @@ int execute( command_t* p_cmd ) {
 	char fullpath_back[PATH_LENGTH]; 
 	char fullpath_redirect[PATH_LENGTH]; 
 
-	background = FALSE;
 	found = FALSE;
 	last = p_cmd->argc - 1;
 	second_last = last - 1;
 	pipe_found = find_pipe(p_cmd);
 
 	// check for &
-	printf("we are here\n");
 	if(p_cmd -> argv[last][0] == '&') {
-		printf("the dpero\n %s", p_cmd -> argv[last]);
 		// background process
 		// need struct without &, use same method as pipe split?
 		save_amp = p_cmd -> argv[last];
 		p_cmd -> argv[last] = NULL;
 
 		find_fullpath(fullpath_back,p_cmd);
-		
-		printf("yep\n");
-		background = TRUE;
 
 		// catching when child dies
 		if (signal(SIGCHLD, sig_child_handler) == SIG_ERR) {
@@ -359,15 +353,13 @@ asynchronously reclaim (or reap) a forked child process that has terminated norm
 */
 
 static void sig_int_handler(int sig) {
-	printf("In SIGINT handler\n");
 	exit(0);
 }
 
 static void sig_child_handler(int sig) {
-	printf("In SIGCHLD handler\n");
 	int status;
 	pid_t pid;
-	while (( pid = waitpid(-1, &status, WNOHANG )) != -1 ) {
-		printf("Child Process (%d) has Terminated\n", pid );
+	while (( pid = waitpid(-1, &status, WNOHANG )) > 0 ) {
+		// printf("Child Process (%d) has Terminated\n", pid );
 	}
 }
