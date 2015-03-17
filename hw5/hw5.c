@@ -9,18 +9,31 @@ int main( int argc, char** argv ) {
 
 	gcount = 0;
 
+	int num_threads, num_iter, max_threads, thread_id, exitstatus;
+	struct rlimit *rlim;
+	rlim = (struct rlimit *) malloc(sizeof(rlim_t) * 2);
+
+	num_threads = argv[1];
+	num_iter = argv[2];
+	getrlimit(RLIMIT_AS, rlim);
+	max_threads = rlim->rlim_cur;
+	perror("shits goin down");
+	// clock_gettime(CLOCK_REALTIME, struct timespec *tp)
+	printf("num threads is %d", max_threads);
+	// p_thread threads[num_threads];
+
 	/*
 
 	---------------------------------------------------------------------
 	Step-by-Step procedure for Monte carlo simulator to estimate PI
 	---------------------------------------------------------------------
 	1. Create the following variables:
-		- pointer to an array of pthread structures
+		- pointer to an array of pthread structures x
 		- counting variables for loops
-		- thread id
-		- exit status of joined thread
-		- number of threads to run
-		- maximum number of threads (hint: rlimit)
+		- thread id x
+		- exit status of joined thread x
+		- number of threads to run x
+		- maximum number of threads (hint: rlimit) ~
 		- nanosecond start and stop time structs (hint: timespec)
 	2. Get number of threads input by user from argv[1]
 	3. Get number of iterations input by user from argv[2]

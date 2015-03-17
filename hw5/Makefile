@@ -19,6 +19,4 @@ run:
 	./hw5 300 100
 
 tarball:
-	# put your tar command here
-	# tar -cvzf <lastname>.tar.gz *
-
+	tar -cvzf barber.tar.gz *
