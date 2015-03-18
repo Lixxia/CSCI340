@@ -22,6 +22,16 @@ int main( int argc, char** argv ) {
 	printf("num threads is %d", max_threads);
 	// p_thread threads[num_threads];
 
+	if(num_threads < max_threads) {
+		// do normal
+		pthread_t threads[num_threads];
+		// get starttime
+		
+	}
+	else {
+		// exit
+	}
+
 	/*
 
 	---------------------------------------------------------------------
