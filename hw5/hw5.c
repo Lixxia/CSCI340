@@ -15,18 +15,23 @@ int main( int argc, char** argv ) {
 
 	num_threads = argv[1];
 	num_iter = argv[2];
-	getrlimit(RLIMIT_AS, rlim);
+	getrlimit(RLIMIT_NPROC, rlim);
 	max_threads = rlim->rlim_cur;
-	perror("shits goin down");
+	perror("things goin down");
 	// clock_gettime(CLOCK_REALTIME, struct timespec *tp)
 	printf("num threads is %d", max_threads);
 	// p_thread threads[num_threads];
 
+
 	if(num_threads < max_threads) {
 		// do normal
+		
 		pthread_t threads[num_threads];
 		// get starttime
-		
+
+
+		// pthread_exit
+		// exit
 	}
 	else {
 		// exit
