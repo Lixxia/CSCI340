@@ -9,12 +9,14 @@ int main( int argc, char** argv ) {
 
 	gcount = 0;
 
-	int num_threads, max_threads, exitstatus;
-	long start_time, end_time, i,j;
+	int exitstatus;
+	long start_time, end_time, i, j, num_threads, max_threads;
 	struct rlimit *rlim;
 	rlim = (struct rlimit *) malloc(sizeof(rlim_t) * 2);
 	struct timespec *ts;
 	ts = (struct timespec *) malloc(sizeof(time_t) * 2);
+	struct timespec *tse;
+	tse = (struct timespec *) malloc(sizeof(time_t) * 2);
 
 	num_threads = strtol(argv[1],NULL,10);
 	numits = strtol(argv[2],NULL,10);
@@ -30,21 +32,19 @@ int main( int argc, char** argv ) {
 
 		pthread_t threads[num_threads];
 
-
 		// get start time
 		clock_gettime(CLOCK_REALTIME, ts);
-		start_time = (long)ts->tv_sec;
 		printf("Start Time: %ld", start_time);
-		printf("num threads 2is %i\n", num_threads);
-		printf("i 1 is %i", i);
+		printf("num threads 2is %ld\n", num_threads);
+		printf("i 1 is %ld", i);
 		for(i=0; i<num_threads; i++) {
-			if(pthread_create(&threads[i], NULL, th_routine, (void*) pthread_self())) {
+			if(pthread_create(&threads[i], NULL, th_routine, (void *)i)) {
 				 perror("Error in create.");
       			 exit(-1);
 			}
 		}
 		printf("j is %i", j);
-		printf("num threads before join is %i\n", num_threads);
+		printf("num threads before join is %ld\n", num_threads);
 		for(j=0; j<num_threads; j++) {
 			if(pthread_join(threads[j], NULL)) {
 				perror("Error in join.");
@@ -58,12 +58,10 @@ int main( int argc, char** argv ) {
 		// exit
 	}
 	printf("\nNum loops: %d", i);
-	printf("\nglobal? %d",gcount);
-	free(ts);
-	ts = (struct timespec *) malloc(sizeof(time_t) * 2);
-	clock_gettime(CLOCK_REALTIME, ts);
-	end_time = (long)ts->tv_sec;
-	printf("\nEnd Time: %ld", end_time);
+	printf("\nglobal? %f",gcount);
+
+	clock_gettime(CLOCK_REALTIME, tse);
+	printf("\nTime in seconds: %f", (mydifftime(ts,tse)/1000000000));
 
 
 	pthread_exit(NULL);
