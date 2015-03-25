@@ -9,8 +9,7 @@ int main( int argc, char** argv ) {
 
 	gcount = 0;
 
-	int exitstatus;
-	long start_time, end_time, i, j, num_threads, max_threads;
+	long start_time, end_time, i, j, num_threads, max_threads, pi, count;
 	struct rlimit *rlim;
 	rlim = (struct rlimit *) malloc(sizeof(rlim_t) * 2);
 	struct timespec *ts;
@@ -25,7 +24,6 @@ int main( int argc, char** argv ) {
 
 	printf("max threads is %ld\n", max_threads);
 	printf("num threads is %ld\n", num_threads);
-	// p_thread threads[num_threads];
 	
 	if(num_threads < max_threads) {
 		// do normal
@@ -58,12 +56,17 @@ int main( int argc, char** argv ) {
 		// exit
 	}
 	printf("\nNum loops: %d", i);
-	printf("\nglobal? %f",gcount);
+	printf("\nValue of count: %f",gcount);
 
 	clock_gettime(CLOCK_REALTIME, tse);
 	printf("\nTime in seconds: %f", (mydifftime(ts,tse)/1000000000));
+	printf("\n count %f", gcount);
+	printf("\n inters %ld", numits);
+	count = gcount/num_threads;
+	printf("\nproper count %ld",count);
+	pi= (gcount/num_threads)/numits;
 
-
+	printf("\npi? %ld", pi);
 	pthread_exit(NULL);
 
 	
