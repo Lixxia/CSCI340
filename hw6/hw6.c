@@ -24,11 +24,22 @@ In this function perform the following steps:
 */
 
 int main( int argc, char** argv ) {
+    pthread_t main_thread;
+    int status;
 
+    if(pthread_create(&main_thread, NULL, th_main, (void *)0) != 0) {
+        perror("Error in create.");
+        status = 1;
+        exit(1);
+    }   
 
-    // ---------------------------------------
-    // TODO: you add your implementation here
+    if(pthread_join(main_thread, NULL) != 0) {
+        perror("Error in join.");
+        status = 2;
+        exit(2);
+    }
 
+    printf("Status value is %i",status);
     return 0;
 
 } // end main function
