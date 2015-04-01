@@ -64,18 +64,18 @@ void* th_main( void* th_main_args ) {
         //check for deadlock
         if(chopsticks[0]==0 && chopsticks[1]==1 && chopsticks[2]==2 && chopsticks[3]==3 && chopsticks[4]==4) {
             //display deadlock
-            printf("DEADLOCK");
-            loop=-1;
+            printf("Deadlock condition (0,1,2,3,4) - Terminating.");
+            break;
         }
         else {
             //see who is eating
-            printf("Philosopher(s)");
+            printf("Philosopher(s) ");
             for(k=0; k < NUM_PHILOSPHERS; k++) {
-                printf("\nchopsticks = %i",chopsticks[k]);
+                // printf("\nphil = %i, chopsticks = %i",k,chopsticks[k]);
                 if(k==4) {
                     //special case
                     if(chopsticks[0]==k && chopsticks[4]==k){
-                        printf("4");
+                        printf("4 ");
                     }
                 }
                 else if(chopsticks[k] == k && chopsticks[k+1] ==k) {
@@ -111,9 +111,9 @@ void* th_main( void* th_main_args ) {
  */
 void* th_phil( void* th_phil_args ) {
     int phil_id = (int)th_phil_args;
-    printf("\nPHIL ID %i",phil_id);
+    // printf("\nPHIL ID %i",phil_id);
     while(1) {
-        delay(1000000000); //thinking
+        delay(3000000000); //thinking
         eat(phil_id);
     }
 
@@ -145,37 +145,45 @@ void delay( long nanosec ) {
  updating a shared resource. After having picked up both 
  chopsticks (as described) the philosopher will delay a 
  number of nanoseconds that is determined by you experimentally.
+ 
  After the delay completes, the philosopher will release 
  the two chopsticks in the reverse order in which they were
  picked up.
  
  */
 void eat( int phil_id ) {
-    int ration, i,j;
-    printf("\n in eat");
-    printf("\n phil id = %i", phil_id);
+    // printf("\n in eat");
+    // printf("\n %i", phil_id); 
 
-    pthread_mutex_lock(mutex);
-    //pick up left chopstick
+    //right chopstick
+    // pthread_mutex_lock(&mutex[phil_id]);
+    chopsticks[phil_id] = phil_id;
+
+    delay(20000);
+
+    //left chopstick
     if(phil_id==4) {
+        pthread_mutex_lock(&mutex[0]);
         chopsticks[0] = phil_id;
     }
     else{
+        pthread_mutex_lock(&mutex[phil_id+1]);
         chopsticks[phil_id+1] = phil_id;
     }
+
+    //wait
     delay(20000);
 
-    pthread_mutex_lock(mutex);
-    //pick up right chopstick
-    chopsticks[phil_id] = phil_id;
-   
- 
-    //wait
-    delay(1000000000);
- 
-    //done, return chopsticks
-    for (j = 0; j < 2; j++) {
-        pthread_mutex_unlock(mutex);
+    //done, return chopsticks in reverse order
+    if(phil_id==4) {
+        pthread_mutex_unlock(&mutex[0]);
     }
+    else {
+        pthread_mutex_unlock(&mutex[phil_id+1]);
+    }
+    pthread_mutex_unlock(&mutex[phil_id]);
+    
+   
+    
 
 } // end eat function
