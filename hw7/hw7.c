@@ -24,10 +24,9 @@
   with the value 1234.
 */
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   // FIRST, NEXT, BEST
-  int i, size, duration, units, runs, seed;
+  int r, t, size, duration, units, runs, seed, times;
   units = (int) strtol(argv[1],0,10);
   seed = (int) strtol(argv[4],0,10);
   mem_init(units);
@@ -37,22 +36,39 @@ int main(int argc, char** argv)
   duration = rand() % MAX_DURATION + MIN_DURATION;
 
   runs = (int) strtol(argv[2],0,10);
+  times = (int) strtol(argv[3],0,10);
   // printf("runs=%i",runs);
+  printf("\nSize=%i",size);
+  printf("\nDuration=%i",duration);
 
-  for(i=0;i<runs;i++) {
+  for(r=0;r<runs;r++) {
     // -1 is allocation failure
     // otherwise value is num probes
-    mem_allocate(FIRST,size,duration);
-    mem_single_time_unit_transpired();
-    mem_clear();
 
-    mem_allocate(NEXT,size,duration);
-    mem_single_time_unit_transpired();
-    mem_clear();
+    // 
+    // allocation request, gather statistics, single time unit transpired 
+    // for each placement for each run for each time unit
+    //mem clear outside 1k loop
+    for(t=0;t<times;t++) {
+      printf("\nResult of mema, %i",mem_allocate(FIRST,size,duration));
+      mem_single_time_unit_transpired();
+      
+    }
+    // mem_clear();
 
-    mem_allocate(BEST,size,duration);
-    mem_single_time_unit_transpired();
-    mem_clear();
+    // for(t=0;t<times;t++) {
+    //   mem_allocate(NEXT,size,duration);
+    //   mem_single_time_unit_transpired();
+    //   // printf("next");
+    // }
+    // mem_clear();
+
+    // for(t=0;t<times;t++) {
+    //   mem_allocate(BEST,size,duration);
+    //   mem_single_time_unit_transpired();
+    //   // printf("best");
+    // }
+    // mem_clear();
   }
   
 
@@ -60,7 +76,7 @@ int main(int argc, char** argv)
   //run argv[2] times
   //take argv[3] units of time
   //rng seeded with argv[4]
-  mem_fragment_count(4);
+  mem_fragment_count(MIN_REQUEST_SIZE-1);
   mem_free();
   return 0;
 }

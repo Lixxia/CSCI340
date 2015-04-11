@@ -38,34 +38,89 @@ static unsigned int last_placement_position;
 int mem_allocate(mem_strategy_t strategy, unsigned int size, unsigned int duration) {
   // FIRST, NEXT, BEST
   // need start count, and how much you've counted until you've reached end of block
-  int count,i;
+  int count,i,j,start_block, block;
+  i=0;
+  count=0;
+  start_block=0;
+  block=0;
+
   if(strategy == FIRST) {
-    while(memory[i] != NULL) {
-      if(memory[i] == 0) {
-        count++;
-      }
-      if(memory[i+1] != 0) {
-        // will segfault at end ?
-        //compare because have reached end of section
-        if(count <= size ) {
-          // put thing
-        }
+    while(i<mem_size) {
+      // printf("\nmem[%i]: %i",i,memory[i]);
+      if((i!=0 && memory[i]==0 && memory[i-1] != 0) || (i==0 && memory[i] ==0)) {
+        //start of block
+        start_block=i;
+        printf("\nstart block=%i",i);
+        block++;
         count=0;
       }
+      if(memory[i]==0) {
+        count++;
+      }
+      else if(memory[i] != 0) {
+        count=0;
+      }
+      // printf("\ncount=%i",i);
+      if(size <= count) {
+        printf("\nDO THE THING @ %i",i);
+          while(count !=0) {
+            printf("\ncount = %i",count);
+            memory[start_block] = duration;
+            start_block++;
+            count--;
+        }
+        break;
+      }
+
+      // if(memory[i] == 0) {
+      //   if(i>0 && memory[i-1] != 0) {
+      //     start_block = i;
+      //     count=0;
+      //   }
+      //   else if(i == mem_size-1) {
+      //     block++;
+      //   }
+      //   count++; // num free blocks
+      // }
+      // // printf("\ncount = %i",count);
+      // if(count == mem_size) {
+      //   block=1;
+      //   // array is fresh, all free
+      //   for(start_block; start_block<size; start_block++) {
+      //       memory[start_block] = duration;
+      //   }
+      // }
+
+      // if(memory[i] == 0 && memory[i+1] != 0 || memory[i] == 0 && memory[i-1] != 0) {
+      //   printf("\nFree portion= %i",i);
+      //   printf("\nCount=%i",count);
+      //   printf("\nSize=%i",size);
+      //   block++;
+      //   if(count <= size ) {
+      //     for(start_block; start_block<count; start_block++) {
+      //       memory[start_block] = duration;
+      //     }
+      //   }
+      //   count=0;
+      // }
+      i++;
     } 
   }
+
+
   else if(strategy == NEXT) {
     //last_placement_position
 
   }
+
   else if(strategy == BEST) {
 
   }
   else {
     return -1;
   }
-
-  return count;
+  printf("\nblocks! %i",block);
+  return block;
 }
 
 /*
@@ -75,9 +130,10 @@ int mem_allocate(mem_strategy_t strategy, unsigned int size, unsigned int durati
 int mem_single_time_unit_transpired() {
   //don't decrement 0
   int i=0;
-  while(memory[i] != NULL) {
+  while(i<mem_size) {
     if(memory[i]>0) {
-      memory[i]--;
+      printf("\nmem[%i]: %i",i,memory[i]);
+      memory[i] = memory[i]-1;
     }
     i++;
   }
@@ -90,11 +146,10 @@ int mem_single_time_unit_transpired() {
   frag_size.
  */
 int mem_fragment_count(int frag_size) {
-  int i;
+  int i = 0;
   int num_frags = 0;
   int num_free = 0;
-  int min_allocation_size = 3;
-  while(memory[i] != NULL) {
+  while(i<mem_size) {
     if(memory[i] == 0) {
       num_free++;
     }
@@ -105,6 +160,7 @@ int mem_fragment_count(int frag_size) {
       }
       num_free=0;
     }
+    i++;
   }
   return num_frags;
 }
@@ -114,7 +170,7 @@ int mem_fragment_count(int frag_size) {
  */
 void mem_clear() {
   int i=0;
-  while(memory[i] != NULL) {
+  while(i<mem_size) {
     memory[i]=0;
     i++;
   }
