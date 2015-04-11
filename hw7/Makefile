@@ -16,7 +16,7 @@ clean:
 	/bin/rm -f hw7 *.o *.gz
 
 run:
-	./hw7 500 20 40 1234
+	./hw7 1000 100 2000 1234
 
 tarball:
 	tar -cvzf barber.tar.gz *
