@@ -1,7 +1,10 @@
 /* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
 */
+int fid; /*global var set by open()*/
+int bps; /*bits per sector from disk */
+
 Disk physical_disk(char* name) {
-    
+    fid = open(name, O_RDONLY);
 }
 
 /* Reads the given logical sector from the Disk and enters the data, byte-by-byte, from that sector into the given buffer. Buffer must be large enough to hold a sector's worth of data.
@@ -11,6 +14,7 @@ Allocate the buffer dynamically to match the size of a sector on the given disk.
 Returns 1 if successful, 0 otherwise.
 */
 int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsinged char* buffer) {
+    read(fid,buffer, bps);
     return 1;
 }
 
