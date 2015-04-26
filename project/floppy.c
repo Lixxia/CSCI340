@@ -6,20 +6,11 @@
 
 /* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
 */
-int fd; /*global var set by open()*/
-int bps; /*bytes per sector from disk */
-/*
-typedef struct {
-    unsigned int bytesPerSector;
-    unsigned int sectorsPerTrack;
-    unsigned int heads;
-    unsigned int cylinders;
-} geometry_t;
-*/
 Disk physical_disk(char* name) {
     disk_t *floppy = (disk_t*) malloc(sizeof(disk_t));
     unsigned int buf;
     handle_t fd;
+
     // open file
     if((fd = open(name, O_RDONLY)) <0) {
         perror(name);
@@ -34,18 +25,33 @@ Disk physical_disk(char* name) {
     printf("\nBytes per Sector: %d",floppy->geometry.bytesPerSector);
 
     // seek sectors per track
-    lseek(fd,13,SEEK_SET);
+    lseek(fd,24,SEEK_SET);
     // read sectors per track
     read(fd,&buf,2);
     // assign value
     floppy->geometry.sectorsPerTrack = buf;
     printf("\nSectors per track: %d",floppy->geometry.sectorsPerTrack);
 
+    // seek heads
+    lseek(fd,26,SEEK_SET);
+    // read heads
+    read(fd,&buf,2);
+    // assign value
+    floppy->geometry.heads = buf;
+    printf("\nHeads: %d",floppy->geometry.heads);
 
-    // lseek(fd,0,SEEK_SET); // moves cursor in fd
-    // adresses in boot sector, lseek to those addresses and read info
-    // populate all structs and return
-    return 0;
+    // seek num sectors
+    lseek(fd,19,SEEK_SET);
+    // read num sectors
+    read(fd,&buf,2);
+
+    // seek cylinders = num tracks = num sectors / sectors per track
+    floppy->geometry.cylinders = buf / floppy->geometry.sectorsPerTrack;
+    printf("\nCylinders: %d",floppy->geometry.cylinders);
+
+    floppy->floppyDisk = fd;
+    close(fd);
+    return floppy;
 }
 
 /* Reads the given logical sector from the Disk and enters the data, byte-by-byte, from that sector into the given buffer. 
@@ -56,8 +62,7 @@ Allocate the buffer dynamically to match the size of a sector on the given disk.
 Returns 1 if successful, 0 otherwise.
 */
 int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* buffer) {
-    bps = 512;
-    read(fd, buffer, bps);
+
     printf("raejwalr: %s",buffer);
     return 1;
 }
