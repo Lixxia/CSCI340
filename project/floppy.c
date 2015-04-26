@@ -89,7 +89,7 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     unsigned char *buffer = (unsigned char*) malloc(bps);
     int offset = logicalSectorNumber*bps;
     char *format;
-    int i,j;
+    int i,k;
 
     sector_read(theDisk,logicalSectorNumber,buffer);
 
@@ -100,7 +100,7 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     }
     else if(type == 'x') {
         // output as hex
-        format = "%01x\t";
+        format = "%#01x\t";
         printf("Hex\n");
     }
     else if(type == 'o') {
@@ -110,9 +110,9 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     }
 
     for(i=0;i<32;i++) {
-        printf("%04x\t",offset+(i*16));
-        for (j = 0; j < 16; j++){
-            printf(format, buffer[(i*16) + j]);
+        printf("%#04x\t",offset+(i*16));
+        for (k=0; k<16; k++){
+            printf(format, buffer[(i*16) + k]);
         }
         printf("\n");
     }

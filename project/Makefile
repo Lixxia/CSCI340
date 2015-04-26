@@ -16,7 +16,7 @@ clean:
 	/bin/rm -f main *.o *.gz
 
 run:
-	./main floppy.img 30 x
+	./main floppy.img 35 o
 
 tarball:
 	tar -cvzf barber.tar.gz *
