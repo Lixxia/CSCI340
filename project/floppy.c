@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include "floppy.h"
 
+
+#define BYTES_TO_LINE 16
+#define BUFFER_DATA 32
 /* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
 */
 Disk physical_disk(char* name) {
@@ -23,7 +26,7 @@ Disk physical_disk(char* name) {
     read(fd,&buf,2);
     // assign value
     floppy->geometry.bytesPerSector = buf;
-    printf("\nBytes per Sector: %d",floppy->geometry.bytesPerSector);
+    // printf("\nBytes per Sector: %d",floppy->geometry.bytesPerSector);
 
     // seek sectors per track
     lseek(fd,24,SEEK_SET);
@@ -31,7 +34,7 @@ Disk physical_disk(char* name) {
     read(fd,&buf,2);
     // assign value
     floppy->geometry.sectorsPerTrack = buf;
-    printf("\nSectors per track: %d",floppy->geometry.sectorsPerTrack);
+    // printf("\nSectors per track: %d",floppy->geometry.sectorsPerTrack);
 
     // seek heads
     lseek(fd,26,SEEK_SET);
@@ -39,7 +42,7 @@ Disk physical_disk(char* name) {
     read(fd,&buf,2);
     // assign value
     floppy->geometry.heads = buf;
-    printf("\nHeads: %d",floppy->geometry.heads);
+    // printf("\nHeads: %d",floppy->geometry.heads);
 
     // seek num sectors
     lseek(fd,19,SEEK_SET);
@@ -48,7 +51,7 @@ Disk physical_disk(char* name) {
 
     // seek cylinders = num tracks = num sectors / sectors per track
     floppy->geometry.cylinders = buf / floppy->geometry.sectorsPerTrack;
-    printf("\nCylinders: %d",floppy->geometry.cylinders);
+    // printf("\nCylinders: %d",floppy->geometry.cylinders);
 
     floppy->floppyDisk = fd;
     return floppy;
@@ -64,15 +67,17 @@ Returns 1 if successful, 0 otherwise.
 int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* buffer) {
     unsigned int bps = theDisk->geometry.bytesPerSector;
     unsigned int offset = logicalSectorNumber*bps;
+    // seek to sector
     if(lseek(theDisk->floppyDisk, offset, SEEK_SET) < 0) {
         perror("Error seeking.");
         return 0;
     }
+    // read sector
     if(read(theDisk->floppyDisk, buffer, bps) < 0) {
         perror("Error reading.");
         return 0;
     }
-
+    
     return 1;
 }
 
@@ -89,7 +94,7 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     unsigned char *buffer = (unsigned char*) malloc(bps);
     int offset = logicalSectorNumber*bps;
     char *format;
-    int i,k;
+    int logical_sector,blocks;
 
     sector_read(theDisk,logicalSectorNumber,buffer);
 
@@ -100,19 +105,22 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     }
     else if(type == 'x') {
         // output as hex
-        format = "%#01x\t";
+        format = "%02x\t";
         printf("Hex\n");
     }
     else if(type == 'o') {
         // output as octal
-        format = "%o\t";
+        format = "%03o\t";
         printf("Oct\n");
     }
 
-    for(i=0;i<32;i++) {
-        printf("%#04x\t",offset+(i*16));
-        for (k=0; k<16; k++){
-            printf(format, buffer[(i*16) + k]);
+    for(logical_sector=0;logical_sector<BUFFER_DATA;logical_sector++) {
+        // print out beginning of logical sector
+        printf("%#04x\t", offset+(logical_sector*BYTES_TO_LINE));
+
+        // print out remaining blocks
+        for (blocks=0; blocks<BYTES_TO_LINE; blocks++){
+            printf(format, buffer[(logical_sector*BYTES_TO_LINE)+blocks]);
         }
         printf("\n");
     }
