@@ -1,3 +1,23 @@
+// disk geometry type
+typedef struct {
+    unsigned int bytesPerSector;
+    unsigned int sectorsPerTrack;
+    unsigned int heads;
+    unsigned int cylinders;
+} geometry_t;
+
+// handle is a file descriptor returned by open()
+typedef int handle_t;
+
+// our floppy disk abstraction
+typedef struct {
+    handle_t floppyDisk;
+    geometry_t geometry;
+} disk_t;
+
+// Disk is a pointer to a disk_t
+typedef disk_t *Disk;
+
 /* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
 */
 Disk physical_disk(char* name);
@@ -8,7 +28,7 @@ Allocate the buffer dynamically to match the size of a sector on the given disk.
 
 Returns 1 if successful, 0 otherwise.
 */
-int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsinged char* buffer);
+int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* buffer);
 
 /* Calls sector_read and then prints the contents of buffer to stdout. This may be one of 'c','x' or 'o' to produce output as char, hex or octal. 
 Output is to be formatted 16 bytes to a line why the physical byte number of the first byte given in hex.

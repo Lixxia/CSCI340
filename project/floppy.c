@@ -1,20 +1,42 @@
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include "floppy.h"
+
 /* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
 */
-int fid; /*global var set by open()*/
-int bps; /*bits per sector from disk */
-
+int fd; /*global var set by open()*/
+int bps; /*bytes per sector from disk */
+/*
+typedef struct {
+    unsigned int bytesPerSector;
+    unsigned int sectorsPerTrack;
+    unsigned int heads;
+    unsigned int cylinders;
+} geometry_t;
+*/
 Disk physical_disk(char* name) {
-    fid = open(name, O_RDONLY);
+    char* buffer[200];
+    fd = open(name, O_RDONLY);
+    read(fd,buffer,512);
+    printf("??? %s",&buffer);
+    // lseek(fd,0,SEEK_SET); // moves cursor in fd
+    // adresses in boot sector, lseek to those addresses and read info
+    // populate all structs and return
+    return 0;
 }
 
-/* Reads the given logical sector from the Disk and enters the data, byte-by-byte, from that sector into the given buffer. Buffer must be large enough to hold a sector's worth of data.
+/* Reads the given logical sector from the Disk and enters the data, byte-by-byte, from that sector into the given buffer. 
+Buffer must be large enough to hold a sector's worth of data.
 
 Allocate the buffer dynamically to match the size of a sector on the given disk.
 
 Returns 1 if successful, 0 otherwise.
 */
-int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsinged char* buffer) {
-    read(fid,buffer, bps);
+int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* buffer) {
+    bps = 512;
+    read(fd, buffer, bps);
+    printf("raejwalr: %s",buffer);
     return 1;
 }
 
