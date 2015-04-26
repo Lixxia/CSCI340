@@ -6,6 +6,7 @@ int main(int argc, char** argv) {
     Disk floppy = physical_disk(argv[1]);
     int sector_num = atoi(argv[2]);
     char type = argv[3][0];
+    
     sector_dump(floppy,sector_num,type);
 
     close(floppy->floppyDisk); // close file descriptor

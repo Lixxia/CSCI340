@@ -5,11 +5,9 @@
 #include <stdio.h>
 #include "floppy.h"
 
-
 #define BYTES_TO_LINE 16
 #define BUFFER_DATA 32
-/* Initializes the MS-DOS device indicated by name and returns information about the device as a Disk.
-*/
+
 Disk physical_disk(char* name) {
     disk_t *floppy = (disk_t*) malloc(sizeof(disk_t));
     unsigned int buf;
@@ -57,13 +55,6 @@ Disk physical_disk(char* name) {
     return floppy;
 }
 
-/* Reads the given logical sector from the Disk and enters the data, byte-by-byte, from that sector into the given buffer. 
-Buffer must be large enough to hold a sector's worth of data.
-
-Allocate the buffer dynamically to match the size of a sector on the given disk.
-
-Returns 1 if successful, 0 otherwise.
-*/
 int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* buffer) {
     unsigned int bps = theDisk->geometry.bytesPerSector;
     unsigned int offset = logicalSectorNumber*bps;
@@ -77,18 +68,10 @@ int sector_read(Disk theDisk, unsigned int logicalSectorNumber, unsigned char* b
         perror("Error reading.");
         return 0;
     }
-    
+
     return 1;
 }
 
-/* Calls sector_read and then prints the contents of buffer to stdout. This may be one of 'c','x' or 'o' to produce output as char, hex or octal. 
-Output is to be formatted 16 bytes to a line why the physical byte number of the first byte given in hex.
-
-Ex:
-Logical sector starts with byte 1234 (4d2 in hex) and buffer contains 32 bytes of numbers 1-32, printout would be:
-0x04d2 001 002 003 004 005 006 007 010 011 012 013 014 015 016 017 020
-0x04e2 021 022 023 024 025 026 027 030 031 032 033 034 035 036 037 040
-*/
 void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     int bps = theDisk->geometry.bytesPerSector;
     unsigned char *buffer = (unsigned char*) malloc(bps);
@@ -101,17 +84,17 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
     if(type == 'c') {
         // output as char
         format = "%c";
-        printf("Char\n");
+        // printf("Char\n");
     }
     else if(type == 'x') {
         // output as hex
         format = "%02x\t";
-        printf("Hex\n");
+        // printf("Hex\n");
     }
     else if(type == 'o') {
         // output as octal
         format = "%03o\t";
-        printf("Oct\n");
+        // printf("Oct\n");
     }
 
     for(logical_sector=0;logical_sector<BUFFER_DATA;logical_sector++) {
@@ -122,6 +105,6 @@ void sector_dump(Disk theDisk, int logicalSectorNumber, char type) {
         for (blocks=0; blocks<BYTES_TO_LINE; blocks++){
             printf(format, buffer[(logical_sector*BYTES_TO_LINE)+blocks]);
         }
-        printf("\n");
+        printf("\n"); // end of line
     }
 }
