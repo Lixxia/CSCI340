@@ -17,15 +17,31 @@ typedef struct {
 } geometry_t;
 */
 Disk physical_disk(char* name) {
-    char buffer[513];
-    int nbytes,i;
-    fd = open(name, O_RDONLY);
-    lseek(fd,0,SEEK_SET);
-    nbytes = read(fd,buffer,512);
-    for(i = 0; i < nbytes; i++) {
-        printf("%02X\n", buffer[i]);
+    disk_t *floppy = (disk_t*) malloc(sizeof(disk_t));
+    unsigned int buf;
+    handle_t fd;
+    // open file
+    if((fd = open(name, O_RDONLY)) <0) {
+        perror(name);
+        exit(1);
     }
-    // printf("0x%s\n",buffer);
+    // seek bytes per sector
+    lseek(fd,11,SEEK_SET);
+    // read bytes per sector
+    read(fd,&buf,2);
+    // assign value
+    floppy->geometry.bytesPerSector = buf;
+    printf("\nBytes per Sector: %d",floppy->geometry.bytesPerSector);
+
+    // seek sectors per track
+    lseek(fd,13,SEEK_SET);
+    // read sectors per track
+    read(fd,&buf,2);
+    // assign value
+    floppy->geometry.sectorsPerTrack = buf;
+    printf("\nSectors per track: %d",floppy->geometry.sectorsPerTrack);
+
+
     // lseek(fd,0,SEEK_SET); // moves cursor in fd
     // adresses in boot sector, lseek to those addresses and read info
     // populate all structs and return
