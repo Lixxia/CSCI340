@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include "floppy.h"
 
@@ -16,10 +17,15 @@ typedef struct {
 } geometry_t;
 */
 Disk physical_disk(char* name) {
-    char* buffer[200];
+    char buffer[513];
+    int nbytes,i;
     fd = open(name, O_RDONLY);
-    read(fd,buffer,512);
-    printf("??? %s",&buffer);
+    lseek(fd,0,SEEK_SET);
+    nbytes = read(fd,buffer,512);
+    for(i = 0; i < nbytes; i++) {
+        printf("%02X\n", buffer[i]);
+    }
+    // printf("0x%s\n",buffer);
     // lseek(fd,0,SEEK_SET); // moves cursor in fd
     // adresses in boot sector, lseek to those addresses and read info
     // populate all structs and return
