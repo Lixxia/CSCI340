@@ -1,7 +1,7 @@
 #include "dpsim.h"
 
 
-static const unsigned int NUM_PHILOSPHERS = 5;
+static const unsigned int NUM_PHILOSOPHERS = 5;
 static const unsigned int NUM_CHOPSTICKS = 5;
 
 static int chopsticks[5];
@@ -15,7 +15,7 @@ void* th_main( void* th_main_args ) {
         chopsticks[i] = -1;
     }
 
-    for(j=0; j<NUM_PHILOSPHERS; j++) {
+    for(j=0; j<NUM_PHILOSOPHERS; j++) {
         if(pthread_create(&philosophers[j], NULL, th_phil, (void *)j)) {
              perror("Error in create.");
              exit(1);
@@ -32,7 +32,7 @@ void* th_main( void* th_main_args ) {
         else {
             //see who is eating
             printf("Philosopher(s) ");
-            for(k=0; k < NUM_PHILOSPHERS; k++) {
+            for(k=0; k < NUM_PHILOSOPHERS; k++) {
                 // printf("\nphil = %i, chopsticks = %i",k,chopsticks[k]);
                 if(k==4) {
                     //special case
@@ -51,7 +51,7 @@ void* th_main( void* th_main_args ) {
     }
 
     //kill all philosophers muahaha
-    for(i=0; i< NUM_PHILOSPHERS; i++) {
+    for(i=0; i< NUM_PHILOSOPHERS; i++) {
         pthread_kill(&philosophers[i],9);
     }
     exit(0);

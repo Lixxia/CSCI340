@@ -25,3 +25,39 @@ Again building upon the previous two assignments. In addition to the system and 
 - Duplicate a file desciptor: `int dup2(int oldfd, int newfd)`
 - Create/open a new file descriptor: `int open(const char* pathname, int flags, mode_t mode)`
 - signals: `sighandler_t signal(int signum, sighandler_t handler)`
+
+## HW5
+Developed a small software application that uses thread computation with a Monte Carlo simulation to estimate Pi.
+
+## HW6
+Simulation of [dining philosophers problem](http://en.wikipedia.org/wiki/Dining_philosophers_problem).
+
+## HW7
+Assignment to compare the effectiveness (in terms of external fragmentation, number of probes, and allocation failures) of three different dynamic partitioning placement algorithms. 
+
+Each element in the array represents a single unit of memory. Value of zero indicates a free unit, a positive value represents a unit in use. 
+
+## Project
+Designed, developed and tested a C-program that will open and read a MS-DOS FAT16 filesystem. 
+
+Example output when run with `floppy.img`, reading sector 35 and output in hex format:
+
+```
+0x4600  54  68  69  73  20  69  73  20  61  20  73  696d    70  6c  65  
+0x4610  20  52  45  41  44  4d  45  20  66  69  6c  6520    66  6f  72  
+0x4620  20  74  68  65  20  70  75  72  70  6f  73  6520    6f  66  20  
+0x4630  68  61  76  69  6e  67  20  61  74  20  6c  6561    73  74  20  
+0x4640  6f  6e  65  0a  66  69  6c  65  20  6f  6e  206f    75  72  20  
+0x4650  66  6c  6f  70  70  79  20  64  72  69  76  652e    20  20  47  
+0x4660  6f  6f  64  20  6c  75  63  6b  20  77  69  7468    20  74  68  
+0x4670  65  20  6c  61  62  2e  20  20  4f  68  68  682c    20  49  20  
+0x4680  61  6c  6d  6f  73  74  0a  66  6f  72  67  6f74    2c  20  68  
+0x4690  61  76  65  20  61  20  67  72  65  61  74  2053    70  72  69  
+0x46a0  6e  67  20  42  72  65  61  6b  21  0a  0a  546f    6e  79  0a  
+0x46b0  0a  00  00  00  00  00  00  00  00  00  00  0000    00  00  00  
+0x46c0  00  00  00  00  00  00  00  00  00  00  00  0000    00  00  00  
+...
+0x47e0  00  00  00  00  00  00  00  00  00  00  00  0000    00  00  00  
+0x47f0  00  00  00  00  00  00  00  00  00  00  00  0000    00  00  00  
+```
+
